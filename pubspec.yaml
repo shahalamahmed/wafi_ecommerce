@@ -46,8 +46,17 @@ dependencies:
 
   # Routing
   go_router: ^14.6.0
-
+  shared_preferences: ^2.3.2
+  flutter_native_splash: ^2.4.1
+  flutter_secure_storage: ^9.2.2
   cupertino_icons: ^1.0.8
+
+
+
+flutter_native_splash:
+  color: "#0A0A1A"
+  android: true
+  ios: true
 
 dev_dependencies:
   flutter_test:

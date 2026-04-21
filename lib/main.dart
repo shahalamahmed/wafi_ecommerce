@@ -1,39 +1,27 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'core/api/dio_client.dart';
+import 'app.dart';
 import 'firebase_options.dart';
 
 void main() async {
+  WidgetsBinding widgetsBinding =
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Splash
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+  // Firebase init
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // Dio init
+  DioClient();
+
   runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
+    const ProviderScope(child: WafiApp()),
   );
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Wafi Ecommerce',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: const Scaffold(
-        body: Center(
-          child: Text('Wafi Ecommerce'),
-        ),
-      ),
-    );
-  }
 }
