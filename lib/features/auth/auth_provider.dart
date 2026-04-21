@@ -50,7 +50,6 @@ class AuthController extends StateNotifier<AuthModel> {
     }
   }
 
-  // Register ✅
   Future<void> register({
     required String email,
     required String password,
@@ -76,7 +75,21 @@ class AuthController extends StateNotifier<AuthModel> {
     }
   }
 
-  // Logout ✅
+  Future<void> loginWithGoogle() async {
+    state = state.copyWith(status: AuthStatus.loading);
+
+    final result = await _authService.loginWithGoogle();
+
+    if (result.isSuccess) {
+      state = result.data!;
+    } else {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: result.error?.message,
+      );
+    }
+  }
+
   Future<void> logout() async {
     await _authService.logout();
     state = const AuthModel(
@@ -85,16 +98,20 @@ class AuthController extends StateNotifier<AuthModel> {
   }
 }
 
-final authControllerProvider =
-StateNotifierProvider<AuthController, AuthModel>((ref) {
-  final authService = ref.watch(authServiceProvider);
-  return AuthController(authService);
-});
+  final authControllerProvider =
+  StateNotifierProvider<AuthController, AuthModel>((ref) {
+    final authService = ref.watch(authServiceProvider);
+    return AuthController(authService);
+  });
 
-final tenantIdProvider = Provider<String?>((ref) {
-  return ref.watch(authControllerProvider).tenantId;
-});
+  final tenantIdProvider = Provider<String?>((ref) {
+    return ref
+        .watch(authControllerProvider)
+        .tenantId;
+  });
 
-final userRoleProvider = Provider<String?>((ref) {
-  return ref.watch(authControllerProvider).role;
-});
+  final userRoleProvider = Provider<String?>((ref) {
+    return ref
+        .watch(authControllerProvider)
+        .role;
+  });

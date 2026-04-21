@@ -13,6 +13,11 @@ class GlassBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme
+        .of(context)
+        .brightness;
+    final isDark = brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
       padding: const EdgeInsets.symmetric(
@@ -20,15 +25,15 @@ class GlassBottomNav extends StatelessWidget {
         vertical: 12,
       ),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
+        color: AppColors.glassSurfaceFor(brightness),
         borderRadius: BorderRadius.circular(32),
         border: Border.all(
-          color: Colors.white.withOpacity(0.18),
+          color: AppColors.glassBorderFor(brightness),
           width: 0.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withOpacity(isDark ? 0.3 : 0.08),
             blurRadius: 50,
             offset: const Offset(0, 10),
           ),
@@ -42,24 +47,28 @@ class GlassBottomNav extends StatelessWidget {
             icon: Icons.dashboard_outlined,
             activeIcon: Icons.dashboard_rounded,
             label: 'Dashboard',
+            brightness: brightness,
           ),
           _buildNavItem(
             index: 1,
             icon: Icons.inventory_2_outlined,
             activeIcon: Icons.inventory_2_rounded,
             label: 'Products',
+            brightness: brightness,
           ),
           _buildNavItem(
             index: 2,
             icon: Icons.shopping_bag_outlined,
             activeIcon: Icons.shopping_bag_rounded,
             label: 'Orders',
+            brightness: brightness,
           ),
           _buildNavItem(
             index: 4,
             icon: Icons.settings_outlined,
             activeIcon: Icons.settings_rounded,
             label: 'Settings',
+            brightness: brightness,
           ),
         ],
       ),
@@ -71,6 +80,7 @@ class GlassBottomNav extends StatelessWidget {
     required IconData icon,
     required IconData activeIcon,
     required String label,
+    required Brightness brightness,
   }) {
     final isActive = currentIndex == index;
 
@@ -80,20 +90,15 @@ class GlassBottomNav extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 8,
+          horizontal: 14,
+          vertical: 7,
         ),
         decoration: BoxDecoration(
           color: isActive
-              ? AppColors.primary.withOpacity(0.2)
+              ? AppColors.primary.withOpacity(0.18)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-          border: isActive
-              ? Border.all(
-            color: AppColors.primary.withOpacity(0.3),
-            width: 0.5,
-          )
-              : null,
+          borderRadius: BorderRadius.circular(20),
+
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -102,7 +107,7 @@ class GlassBottomNav extends StatelessWidget {
               isActive ? activeIcon : icon,
               color: isActive
                   ? AppColors.primary
-                  : AppColors.textHint,
+                  : AppColors.textHintFor(brightness),
               size: 22,
             ),
             const SizedBox(height: 4),
@@ -110,25 +115,14 @@ class GlassBottomNav extends StatelessWidget {
               duration: const Duration(milliseconds: 200),
               style: TextStyle(
                 fontSize: 9,
-                fontWeight: isActive
-                    ? FontWeight.w600
-                    : FontWeight.w400,
+                fontWeight:
+                isActive ? FontWeight.w600 : FontWeight.w400,
                 color: isActive
                     ? AppColors.primary
-                    : AppColors.textHint,
+                    : AppColors.textHintFor(brightness),
                 letterSpacing: 0.3,
               ),
               child: Text(label),
-            ),
-            const SizedBox(height: 2),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: isActive ? 4 : 0,
-              height: isActive ? 4 : 0,
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                shape: BoxShape.circle,
-              ),
             ),
           ],
         ),

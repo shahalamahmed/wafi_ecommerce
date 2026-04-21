@@ -23,12 +23,14 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.06),
+        color: AppColors.glassSurfaceFor(brightness),
         border: Border(
           bottom: BorderSide(
-            color: Colors.white.withOpacity(0.1),
+            color: AppColors.glassBorderFor(brightness),
             width: 0.5,
           ),
         ),
@@ -44,6 +46,7 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
               // Leading
               if (showBackButton)
                 _buildIconButton(
+                  context: context,
                   icon: Icons.arrow_back_ios_rounded,
                   onTap: () => Navigator.pop(context),
                 )
@@ -60,8 +63,8 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
+                      style: TextStyle(
+                        color: AppColors.textPrimaryFor(brightness),
                         fontSize: AppSizes.fontXl,
                         fontWeight: FontWeight.w600,
                         letterSpacing: -0.3,
@@ -71,8 +74,8 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
                       const SizedBox(height: 2),
                       Text(
                         subtitle!,
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
+                        style: TextStyle(
+                          color: AppColors.textSecondaryFor(brightness),
                           fontSize: AppSizes.fontXs,
                           fontWeight: FontWeight.w400,
                         ),
@@ -92,25 +95,28 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   Widget _buildIconButton({
+    required BuildContext context,
     required IconData icon,
     required VoidCallback onTap,
   }) {
+    final brightness = Theme.of(context).brightness;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 38,
         height: 38,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.08),
+          color: AppColors.glassSurfaceFor(brightness),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: Colors.white.withOpacity(0.15),
+            color: AppColors.glassBorderFor(brightness),
             width: 0.5,
           ),
         ),
         child: Icon(
           icon,
-          color: AppColors.textPrimary,
+          color: AppColors.textPrimaryFor(brightness),
           size: 18,
         ),
       ),
@@ -133,6 +139,8 @@ class GlassAppBarAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -140,16 +148,16 @@ class GlassAppBarAction extends StatelessWidget {
         height: 38,
         margin: const EdgeInsets.only(right: 8),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.08),
+          color: AppColors.glassSurfaceFor(brightness),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: Colors.white.withOpacity(0.15),
+            color: AppColors.glassBorderFor(brightness),
             width: 0.5,
           ),
         ),
         child: Icon(
           icon,
-          color: color ?? AppColors.textPrimary,
+          color: color ?? AppColors.textPrimaryFor(brightness),
           size: 18,
         ),
       ),

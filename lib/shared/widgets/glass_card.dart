@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:wafi_ecommerce/core/constants/colors.dart';
 import 'package:wafi_ecommerce/core/constants/sizes.dart';
 
-// Glass Card — Normal
 class GlassCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
@@ -19,22 +18,25 @@ class GlassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+    final isDark = brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: padding ??
             const EdgeInsets.all(AppSizes.md),
         decoration: BoxDecoration(
-          color: AppColors.glassSurface,
+          color: AppColors.glassSurfaceFor(brightness),
           borderRadius: borderRadius ??
               BorderRadius.circular(AppSizes.radiusLg),
           border: Border.all(
-            color: AppColors.glassBorder,
+            color: AppColors.glassBorderFor(brightness),
             width: 0.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withOpacity(isDark ? 0.2 : 0.08),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -63,6 +65,8 @@ class GlassGradientCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -74,18 +78,18 @@ class GlassGradientCard extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: gradientColors ??
                 [
-                  AppColors.primary.withOpacity(0.3),
-                  AppColors.purple.withOpacity(0.2),
+                  AppColors.primary.withOpacity(isDark ? 0.3 : 0.18),
+                  AppColors.purple.withOpacity(isDark ? 0.2 : 0.12),
                 ],
           ),
           borderRadius: BorderRadius.circular(AppSizes.radiusLg),
           border: Border.all(
-            color: AppColors.primary.withOpacity(0.3),
+            color: AppColors.primary.withOpacity(isDark ? 0.3 : 0.18),
             width: 0.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withOpacity(0.2),
+              color: AppColors.primary.withOpacity(isDark ? 0.2 : 0.12),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),

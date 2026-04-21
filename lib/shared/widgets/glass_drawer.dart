@@ -22,20 +22,28 @@ class GlassDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+    final isDark = brightness == Brightness.dark;
+
     return Container(
       width: MediaQuery.of(context).size.width * 0.78,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            AppColors.bgSecondary,
-            AppColors.bgPrimary,
-          ],
+          colors: isDark
+              ? [
+                  AppColors.bgSecondary,
+                  AppColors.bgPrimary,
+                ]
+              : [
+                  AppColors.bgSecondaryLight,
+                  AppColors.bgPrimaryLight,
+                ],
         ),
         border: Border(
           right: BorderSide(
-            color: Colors.white.withOpacity(0.1),
+            color: AppColors.glassBorderFor(brightness),
             width: 0.5,
           ),
         ),
@@ -44,13 +52,13 @@ class GlassDrawer extends StatelessWidget {
         child: Column(
           children: [
             // Header
-            _buildHeader(),
+            _buildHeader(brightness),
 
             const SizedBox(height: 8),
 
             // Divider
             Divider(
-              color: Colors.white.withOpacity(0.1),
+              color: AppColors.glassBorderFor(brightness),
               thickness: 0.5,
               indent: 20,
               endIndent: 20,
@@ -71,6 +79,7 @@ class GlassDrawer extends StatelessWidget {
                     activeIcon: Icons.dashboard_rounded,
                     label: 'Dashboard',
                     context: context,
+                    brightness: brightness,
                   ),
                   _buildMenuItem(
                     index: 1,
@@ -78,6 +87,7 @@ class GlassDrawer extends StatelessWidget {
                     activeIcon: Icons.inventory_2_rounded,
                     label: 'Products',
                     context: context,
+                    brightness: brightness,
                   ),
                   _buildMenuItem(
                     index: 2,
@@ -85,6 +95,7 @@ class GlassDrawer extends StatelessWidget {
                     activeIcon: Icons.shopping_bag_rounded,
                     label: 'Orders',
                     context: context,
+                    brightness: brightness,
                   ),
                   _buildMenuItem(
                     index: 3,
@@ -92,6 +103,7 @@ class GlassDrawer extends StatelessWidget {
                     activeIcon: Icons.people_rounded,
                     label: 'Customers',
                     context: context,
+                    brightness: brightness,
                   ),
                   _buildMenuItem(
                     index: 4,
@@ -99,6 +111,7 @@ class GlassDrawer extends StatelessWidget {
                     activeIcon: Icons.settings_rounded,
                     label: 'Settings',
                     context: context,
+                    brightness: brightness,
                   ),
                 ],
               ),
@@ -106,14 +119,14 @@ class GlassDrawer extends StatelessWidget {
 
             // Divider
             Divider(
-              color: Colors.white.withOpacity(0.1),
+              color: AppColors.glassBorderFor(brightness),
               thickness: 0.5,
               indent: 20,
               endIndent: 20,
             ),
 
             // Logout
-            _buildLogoutButton(context),
+            _buildLogoutButton(context, brightness),
 
             const SizedBox(height: 16),
           ],
@@ -122,15 +135,17 @@ class GlassDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(Brightness brightness) {
+    final isDark = brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.06),
+        color: AppColors.glassSurfaceFor(brightness),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Colors.white.withOpacity(0.12),
+          color: AppColors.glassBorderFor(brightness),
           width: 0.5,
         ),
       ),
@@ -176,8 +191,8 @@ class GlassDrawer extends StatelessWidget {
               children: [
                 Text(
                   storeName,
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
+                  style: TextStyle(
+                    color: AppColors.textPrimaryFor(brightness),
                     fontSize: AppSizes.fontMd,
                     fontWeight: FontWeight.w600,
                   ),
@@ -186,8 +201,8 @@ class GlassDrawer extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   email,
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
+                  style: TextStyle(
+                    color: AppColors.textSecondaryFor(brightness),
                     fontSize: AppSizes.fontXs,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -200,10 +215,10 @@ class GlassDrawer extends StatelessWidget {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.2),
+                    color: AppColors.primary.withOpacity(isDark ? 0.2 : 0.12),
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color: AppColors.primary.withOpacity(0.3),
+                      color: AppColors.primary.withOpacity(isDark ? 0.3 : 0.2),
                       width: 0.5,
                     ),
                   ),
@@ -231,6 +246,7 @@ class GlassDrawer extends StatelessWidget {
     required IconData activeIcon,
     required String label,
     required BuildContext context,
+    required Brightness brightness,
   }) {
     final isActive = currentIndex == index;
 
@@ -264,7 +280,7 @@ class GlassDrawer extends StatelessWidget {
               isActive ? activeIcon : icon,
               color: isActive
                   ? AppColors.primary
-                  : AppColors.textSecondary,
+                  : AppColors.textSecondaryFor(brightness),
               size: 20,
             ),
             const SizedBox(width: 14),
@@ -273,7 +289,7 @@ class GlassDrawer extends StatelessWidget {
               style: TextStyle(
                 color: isActive
                     ? AppColors.primary
-                    : AppColors.textSecondary,
+                    : AppColors.textSecondaryFor(brightness),
                 fontSize: AppSizes.fontMd,
                 fontWeight: isActive
                     ? FontWeight.w600
@@ -297,7 +313,7 @@ class GlassDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildLogoutButton(BuildContext context) {
+  Widget _buildLogoutButton(BuildContext context, Brightness brightness) {
     return GestureDetector(
       onTap: () {
         Navigator.pop(context);
@@ -313,7 +329,9 @@ class GlassDrawer extends StatelessWidget {
           color: AppColors.error.withOpacity(0.1),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: AppColors.error.withOpacity(0.2),
+            color: AppColors.error.withOpacity(
+              brightness == Brightness.dark ? 0.2 : 0.25,
+            ),
             width: 0.5,
           ),
         ),

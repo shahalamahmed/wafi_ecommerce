@@ -172,19 +172,27 @@ class _LayoutBackdrop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Stack(
       fit: StackFit.expand,
       children: [
         Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                AppColors.bgSecondary,
-                AppColors.bgPrimary,
-                AppColors.bgTertiary,
-              ],
+              colors: isDark
+                  ? [
+                      AppColors.bgSecondary,
+                      AppColors.bgPrimary,
+                      AppColors.bgTertiary,
+                    ]
+                  : [
+                      AppColors.bgSecondaryLight,
+                      AppColors.bgPrimaryLight,
+                      AppColors.bgTertiaryLight,
+                    ],
             ),
           ),
         ),
@@ -193,7 +201,7 @@ class _LayoutBackdrop extends StatelessWidget {
           right: -40,
           child: _GlowOrb(
             size: 260,
-            color: AppColors.primary.withOpacity(0.26),
+            color: AppColors.primary.withOpacity(isDark ? 0.26 : 0.18),
           ),
         ),
         Positioned(
@@ -201,7 +209,7 @@ class _LayoutBackdrop extends StatelessWidget {
           left: -70,
           child: _GlowOrb(
             size: 220,
-            color: AppColors.purple.withOpacity(0.22),
+            color: AppColors.purple.withOpacity(isDark ? 0.22 : 0.14),
           ),
         ),
         Positioned(
@@ -209,7 +217,7 @@ class _LayoutBackdrop extends StatelessWidget {
           right: -50,
           child: _GlowOrb(
             size: 190,
-            color: Colors.cyanAccent.withOpacity(0.14),
+            color: Colors.cyanAccent.withOpacity(isDark ? 0.14 : 0.08),
           ),
         ),
       ],
@@ -251,6 +259,8 @@ class _HeroPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -258,18 +268,25 @@ class _HeroPanel extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Colors.white.withOpacity(0.16),
-            Colors.white.withOpacity(0.05),
-          ],
+          colors: isDark
+              ? [
+                  Colors.white.withOpacity(0.16),
+                  Colors.white.withOpacity(0.05),
+                ]
+              : [
+                  Colors.white.withOpacity(0.78),
+                  AppColors.primary.withOpacity(0.06),
+                ],
         ),
         border: Border.all(
-          color: Colors.white.withOpacity(0.18),
+          color: isDark
+              ? Colors.white.withOpacity(0.18)
+              : Colors.black.withOpacity(0.06),
           width: 0.8,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.24),
+            color: Colors.black.withOpacity(isDark ? 0.24 : 0.08),
             blurRadius: 24,
             offset: const Offset(0, 18),
           ),
@@ -337,9 +354,13 @@ class _HeroPanel extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: Colors.black.withOpacity(0.14),
+                  color: isDark
+                      ? Colors.black.withOpacity(0.14)
+                      : Colors.white.withOpacity(0.48),
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.12),
+                    color: isDark
+                        ? Colors.white.withOpacity(0.12)
+                        : Colors.black.withOpacity(0.06),
                     width: 0.6,
                   ),
                 ),
@@ -497,6 +518,8 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+
     return Row(
       children: [
         Expanded(
@@ -510,17 +533,17 @@ class _SectionTitle extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.06),
+            color: AppColors.glassSurfaceFor(brightness),
             borderRadius: BorderRadius.circular(999),
             border: Border.all(
-              color: Colors.white.withOpacity(0.12),
+              color: AppColors.glassBorderFor(brightness),
               width: 0.5,
             ),
           ),
           child: Text(
             actionLabel,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: AppColors.textSecondaryFor(brightness),
                 ),
           ),
         ),
@@ -700,6 +723,8 @@ class _PanelBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
@@ -712,8 +737,10 @@ class _PanelBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: const TextStyle(
-          color: AppColors.primary,
+        style: TextStyle(
+          color: brightness == Brightness.dark
+              ? AppColors.primary
+              : AppColors.primaryDark,
           fontSize: AppSizes.fontXs,
           fontWeight: FontWeight.w700,
           letterSpacing: 0.8,
@@ -734,22 +761,24 @@ class _GlassCircleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.08),
+          color: AppColors.glassSurfaceFor(brightness),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: Colors.white.withOpacity(0.14),
+            color: AppColors.glassBorderFor(brightness),
             width: 0.5,
           ),
         ),
         child: Icon(
           icon,
-          color: AppColors.textPrimary,
+          color: AppColors.textPrimaryFor(brightness),
           size: 20,
         ),
       ),
