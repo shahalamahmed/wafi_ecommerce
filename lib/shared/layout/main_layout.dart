@@ -10,6 +10,7 @@ import 'package:wafi_ecommerce/shared/widgets/glass_appbar.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_bottom_nav.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_card.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_drawer.dart';
+import 'package:wafi_ecommerce/shared/widgets/snackbar_message.dart';
 
 class MainLayout extends ConsumerStatefulWidget {
   const MainLayout({super.key});
@@ -70,7 +71,14 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         role: role,
         currentIndex: _currentIndex,
         onItemTap: _handleNavTap,
-        onLogout: () => ref.read(authControllerProvider.notifier).logout(),
+        onLogout: () async {
+          await ref.read(authControllerProvider.notifier).logout();
+          if (!mounted) return;
+          SnackbarMessage.show(
+            context: context,
+            message: 'Signed out successfully.',
+          );
+        },
       ),
       appBar: GlassAppBar(
         title: currentItem.title,

@@ -6,6 +6,7 @@ import 'package:wafi_ecommerce/features/auth/auth_model.dart';
 import 'package:wafi_ecommerce/features/auth/auth_provider.dart';
 import 'package:wafi_ecommerce/shared/widgets/auth_widgets.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_button.dart';
+import 'package:wafi_ecommerce/shared/widgets/snackbar_message.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   final VoidCallback onRegisterTap;
@@ -29,15 +30,55 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _login() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) return;
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      SnackbarMessage.show(
+        context: context,
+        message: 'Email and password are required.',
+        isError: true,
+      );
+      return;
+    }
+
     await ref.read(authControllerProvider.notifier).login(
       email: _emailController.text.trim(),
       password: _passwordController.text,
     );
+
+    if (!mounted) return;
+
+    final authState = ref.read(authControllerProvider);
+    if (authState.status == AuthStatus.authenticated) {
+      SnackbarMessage.show(
+        context: context,
+        message: 'Signed in successfully.',
+      );
+    } else if (authState.status == AuthStatus.error) {
+      SnackbarMessage.show(
+        context: context,
+        message: authState.errorMessage ?? 'Unable to sign in.',
+        isError: true,
+      );
+    }
   }
 
   Future<void> _googleLogin() async {
     await ref.read(authControllerProvider.notifier).loginWithGoogle();
+
+    if (!mounted) return;
+
+    final authState = ref.read(authControllerProvider);
+    if (authState.status == AuthStatus.authenticated) {
+      SnackbarMessage.show(
+        context: context,
+        message: 'Google sign in successful.',
+      );
+    } else if (authState.status == AuthStatus.error) {
+      SnackbarMessage.show(
+        context: context,
+        message: authState.errorMessage ?? 'Google sign in failed.',
+        isError: true,
+      );
+    }
   }
 
   @override
@@ -105,9 +146,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ),
                       ),
-
-                      if (authState.status == AuthStatus.error)
-                        AuthErrorWidget(message: authState.errorMessage ?? 'Error!'),
 
                       const SizedBox(height: AppSizes.sm),
 

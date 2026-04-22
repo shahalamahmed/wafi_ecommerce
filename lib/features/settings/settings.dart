@@ -6,6 +6,7 @@ import 'package:wafi_ecommerce/core/theme/theme_provider.dart';
 import 'package:wafi_ecommerce/features/auth/auth_provider.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_button.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_card.dart';
+import 'package:wafi_ecommerce/shared/widgets/snackbar_message.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -35,6 +36,10 @@ class SettingsScreen extends ConsumerWidget {
             selectedMode: themeMode,
             onModeSelected: (mode) {
               ref.read(themeProvider.notifier).setThemeMode(mode);
+              SnackbarMessage.show(
+                context: context,
+                message: '${_themeModeLabel(mode)} mode applied.',
+              );
             },
           ),
           const SizedBox(height: 18),
@@ -44,11 +49,29 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           _LogoutCard(
-            onLogout: () => ref.read(authControllerProvider.notifier).logout(),
+            onLogout: () async {
+              await ref.read(authControllerProvider.notifier).logout();
+              if (!context.mounted) return;
+              SnackbarMessage.show(
+                context: context,
+                message: 'Signed out successfully.',
+              );
+            },
           ),
         ],
       ),
     );
+  }
+}
+
+String _themeModeLabel(ThemeMode mode) {
+  switch (mode) {
+    case ThemeMode.light:
+      return 'Light';
+    case ThemeMode.dark:
+      return 'Dark';
+    case ThemeMode.system:
+      return 'System';
   }
 }
 

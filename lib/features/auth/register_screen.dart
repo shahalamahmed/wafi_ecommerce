@@ -6,6 +6,7 @@ import 'package:wafi_ecommerce/features/auth/auth_model.dart';
 import 'package:wafi_ecommerce/features/auth/auth_provider.dart';
 import 'package:wafi_ecommerce/shared/widgets/auth_widgets.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_button.dart';
+import 'package:wafi_ecommerce/shared/widgets/snackbar_message.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   final VoidCallback onLoginTap;
@@ -36,9 +37,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Future<void> _register() async {
     if (_storeNameController.text.isEmpty ||
         _emailController.text.isEmpty ||
-        _passwordController.text.isEmpty) return;
+        _passwordController.text.isEmpty) {
+      SnackbarMessage.show(
+        context: context,
+        message: 'Store name, email and password are required.',
+        isError: true,
+      );
+      return;
+    }
 
-    if (_passwordController.text != _confirmController.text) return;
+    if (_passwordController.text != _confirmController.text) {
+      SnackbarMessage.show(
+        context: context,
+        message: 'Password and confirm password must match.',
+        isError: true,
+      );
+      return;
+    }
 
     final tenantId =
         '${_storeNameController.text.toLowerCase().replaceAll(' ', '_')}_${DateTime.now().millisecondsSinceEpoch}';
@@ -49,10 +64,42 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       tenantId: tenantId,
       role: 'admin',
     );
+
+    if (!mounted) return;
+
+    final authState = ref.read(authControllerProvider);
+    if (authState.status == AuthStatus.authenticated) {
+      SnackbarMessage.show(
+        context: context,
+        message: 'Store created successfully.',
+      );
+    } else if (authState.status == AuthStatus.error) {
+      SnackbarMessage.show(
+        context: context,
+        message: authState.errorMessage ?? 'Unable to create store.',
+        isError: true,
+      );
+    }
   }
 
   Future<void> _googleRegister() async {
     await ref.read(authControllerProvider.notifier).loginWithGoogle();
+
+    if (!mounted) return;
+
+    final authState = ref.read(authControllerProvider);
+    if (authState.status == AuthStatus.authenticated) {
+      SnackbarMessage.show(
+        context: context,
+        message: 'Google account connected successfully.',
+      );
+    } else if (authState.status == AuthStatus.error) {
+      SnackbarMessage.show(
+        context: context,
+        message: authState.errorMessage ?? 'Google sign in failed.',
+        isError: true,
+      );
+    }
   }
 
   @override
@@ -119,9 +166,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         onToggleObscure: () =>
                             setState(() => _confirmObscure = !_confirmObscure),
                       ),
-
-                      if (authState.status == AuthStatus.error)
-                        AuthErrorWidget(message: authState.errorMessage ?? 'Error!'),
 
                       const SizedBox(height: AppSizes.lg),
 
