@@ -51,6 +51,8 @@ class AuthService {
         'email': email.trim(),
         'tenantId': tenantId,
         'role': role,
+        'photoUrl': null,
+        'coverUrl': null,
         'createdAt': FieldValue.serverTimestamp(),
       });
 
@@ -64,6 +66,8 @@ class AuthService {
         email: email,
         tenantId: tenantId,
         role: role,
+        photoUrl: null,
+        coverUrl: null,
       ));
 
     } on FirebaseAuthException catch (e) {
@@ -90,6 +94,8 @@ class AuthService {
       final data = doc.data()!;
       final tenantId = data['tenantId'] as String;
       final role = data['role'] as String;
+      final photoUrl = data['photoUrl'] as String?;
+      final coverUrl = data['coverUrl'] as String?;
 
       await _storage.saveUserId(uid);
       await _storage.saveTenantId(tenantId);
@@ -101,6 +107,8 @@ class AuthService {
         email: data['email'],
         tenantId: tenantId,
         role: role,
+        photoUrl: photoUrl,
+        coverUrl: coverUrl,
       ));
     } catch (e) {
       return Result.failure(ErrorHandler.handle(e));
@@ -148,11 +156,14 @@ class AuthService {
         final tenantId =
             '${googleUser.displayName?.toLowerCase().replaceAll(' ', '_') ?? 'store'}_$uid';
 
+        final googlePhotoUrl = googleUser.photoUrl;
         await _firestore.collection('users').doc(uid).set({
           'email': email,
           'tenantId': tenantId,
           'role': 'admin',
           'createdAt': FieldValue.serverTimestamp(),
+          'photoUrl': googlePhotoUrl,
+          'coverUrl': null,
         });
 
         await _storage.saveUserId(uid);
@@ -165,6 +176,9 @@ class AuthService {
           email: email,
           tenantId: tenantId,
           role: 'admin',
+          photoUrl: googlePhotoUrl,
+          coverUrl: null,
+
         ));
       }
     } on FirebaseAuthException catch (e) {

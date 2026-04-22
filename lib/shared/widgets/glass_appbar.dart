@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:wafi_ecommerce/core/constants/colors.dart';
 import 'package:wafi_ecommerce/core/constants/sizes.dart';
 
@@ -8,6 +9,8 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
   final Widget? leading;
   final bool showBackButton;
+  final String? profileImageUrl;
+  final VoidCallback? onProfileTap;
 
   const GlassAppBar({
     super.key,
@@ -16,6 +19,8 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.actions,
     this.leading,
     this.showBackButton = false,
+    this.profileImageUrl,
+    this.onProfileTap,
   });
 
   @override
@@ -27,13 +32,34 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.glassSurfaceFor(brightness),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: brightness == Brightness.dark
+              ? [
+                  const Color(0xCC0E1430),
+                  const Color(0xB3191338),
+                ]
+              : [
+                  Colors.white.withOpacity(0.92),
+                  const Color(0xFFF1F4FF),
+                ],
+        ),
         border: Border(
           bottom: BorderSide(
             color: AppColors.glassBorderFor(brightness),
             width: 0.5,
           ),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(
+              brightness == Brightness.dark ? 0.18 : 0.05,
+            ),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: SafeArea(
         child: Padding(
@@ -53,40 +79,77 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
               else if (leading != null)
                 leading!,
 
-              const SizedBox(width: 12),
+              if (showBackButton || leading != null) const SizedBox(width: 12),
 
               // Title
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                child: Row(
                   children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        color: AppColors.textPrimaryFor(brightness),
-                        fontSize: AppSizes.fontXl,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: -0.3,
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFF4F46E5),
+                            Color(0xFF7C3AED),
+                          ],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF4F46E5).withOpacity(0.18),
+                            blurRadius: 14,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.shopping_bag_rounded,
+                        color: Colors.white,
+                        size: 18,
                       ),
                     ),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        subtitle!,
-                        style: TextStyle(
-                          color: AppColors.textSecondaryFor(brightness),
-                          fontSize: AppSizes.fontXs,
-                          fontWeight: FontWeight.w400,
-                        ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            title,
+                            style: GoogleFonts.poppins(
+                              color: AppColors.textPrimaryFor(brightness),
+                              fontSize: AppSizes.fontXl,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: -0.3,
+                            ),
+                          ),
+                          if (subtitle != null) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              subtitle!,
+                              style: GoogleFonts.poppins(
+                                color: AppColors.textSecondaryFor(brightness),
+                                fontSize: AppSizes.fontXs,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
-                    ],
+                    ),
                   ],
                 ),
               ),
 
               // Actions
               if (actions != null) ...actions!,
+              if (profileImageUrl != null)
+                GlassProfileAvatarAction(
+                  imageUrl: profileImageUrl!,
+                  onTap: onProfileTap ?? () {},
+                ),
             ],
           ),
         ),
@@ -159,6 +222,48 @@ class GlassAppBarAction extends StatelessWidget {
           icon,
           color: color ?? AppColors.textPrimaryFor(brightness),
           size: 18,
+        ),
+      ),
+    );
+  }
+}
+
+class GlassProfileAvatarAction extends StatelessWidget {
+  final String imageUrl;
+  final VoidCallback onTap;
+
+  const GlassProfileAvatarAction({
+    super.key,
+    required this.imageUrl,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(2.2),
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFF4F46E5),
+                Color(0xFF7C3AED),
+                Color(0xFFA855F7),
+              ],
+            ),
+          ),
+          child: CircleAvatar(
+            radius: 20,
+            backgroundColor: Colors.white,
+            child: CircleAvatar(
+              radius: 18,
+              backgroundImage: NetworkImage(imageUrl),
+            ),
+          ),
         ),
       ),
     );

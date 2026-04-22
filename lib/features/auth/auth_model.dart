@@ -12,6 +12,8 @@ class AuthModel {
   final String? email;
   final String? tenantId;
   final String? role;
+  final String? photoUrl;
+  final String? coverUrl;
   final String? errorMessage;
 
   const AuthModel({
@@ -20,6 +22,8 @@ class AuthModel {
     this.email,
     this.tenantId,
     this.role,
+    this.photoUrl,
+    this.coverUrl,
     this.errorMessage,
   });
 
@@ -33,7 +37,10 @@ class AuthModel {
     String? email,
     String? tenantId,
     String? role,
+    String? photoUrl,
+    String? coverUrl,
     String? errorMessage,
+
   }) {
     return AuthModel(
       status: status ?? this.status,
@@ -41,6 +48,8 @@ class AuthModel {
       email: email ?? this.email,
       tenantId: tenantId ?? this.tenantId,
       role: role ?? this.role,
+      photoUrl: photoUrl ?? this.photoUrl,
+      coverUrl: coverUrl ?? this.coverUrl,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }

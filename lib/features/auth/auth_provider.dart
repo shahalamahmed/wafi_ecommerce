@@ -10,7 +10,7 @@ class AuthController extends StateNotifier<AuthModel> {
   final AuthService _authService;
 
   AuthController(this._authService)
-      : super(const AuthModel(status: AuthStatus.initial));
+    : super(const AuthModel(status: AuthStatus.initial));
 
   // Initialize ✅
   Future<void> initializeAuth() async {
@@ -29,16 +29,10 @@ class AuthController extends StateNotifier<AuthModel> {
   }
 
   // Login ✅
-  Future<void> login({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> login({required String email, required String password}) async {
     state = state.copyWith(status: AuthStatus.loading);
 
-    final result = await _authService.login(
-      email: email,
-      password: password,
-    );
+    final result = await _authService.login(email: email, password: password);
 
     if (result.isSuccess) {
       state = result.data!;
@@ -90,28 +84,39 @@ class AuthController extends StateNotifier<AuthModel> {
     }
   }
 
+  void updatePhotoUrl(String url) {
+    state = state.copyWith(photoUrl: url);
+  }
+
+  void updateCoverUrl(String url) {
+    state = state.copyWith(coverUrl: url);
+  }
+
   Future<void> logout() async {
     await _authService.logout();
-    state = const AuthModel(
-      status: AuthStatus.unauthenticated,
-    );
+    state = const AuthModel(status: AuthStatus.unauthenticated);
   }
 }
 
-  final authControllerProvider =
-  StateNotifierProvider<AuthController, AuthModel>((ref) {
+final authControllerProvider = StateNotifierProvider<AuthController, AuthModel>(
+  (ref) {
     final authService = ref.watch(authServiceProvider);
     return AuthController(authService);
-  });
+  },
+);
 
-  final tenantIdProvider = Provider<String?>((ref) {
-    return ref
-        .watch(authControllerProvider)
-        .tenantId;
-  });
+final tenantIdProvider = Provider<String?>((ref) {
+  return ref.watch(authControllerProvider).tenantId;
+});
 
-  final userRoleProvider = Provider<String?>((ref) {
-    return ref
-        .watch(authControllerProvider)
-        .role;
-  });
+final userRoleProvider = Provider<String?>((ref) {
+  return ref.watch(authControllerProvider).role;
+});
+
+final photoUrlProvider = Provider<String?>((ref) {
+  return ref.watch(authControllerProvider).photoUrl;
+});
+
+final coverUrlProvider = Provider<String?>((ref) {
+  return ref.watch(authControllerProvider).coverUrl;
+});

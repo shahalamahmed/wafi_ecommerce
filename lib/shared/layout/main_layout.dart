@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wafi_ecommerce/core/constants/colors.dart';
 import 'package:wafi_ecommerce/core/constants/sizes.dart';
+import 'package:wafi_ecommerce/core/utils/firestore_seeder.dart';
 import 'package:wafi_ecommerce/features/auth/auth_provider.dart';
+import 'package:wafi_ecommerce/features/profile/profile_screen.dart';
 import 'package:wafi_ecommerce/features/settings/settings.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_appbar.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_bottom_nav.dart';
@@ -20,6 +22,8 @@ class MainLayout extends ConsumerStatefulWidget {
 }
 
 class _MainLayoutState extends ConsumerState<MainLayout> {
+  static const String _profileAvatarUrl =
+      'https://picsum.photos/200/200?random=11';
   int _currentIndex = 0;
 
   static const List<_NavItemData> _items = [
@@ -89,16 +93,14 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
             onTap: () => Scaffold.of(context).openDrawer(),
           ),
         ),
-        actions: [
-          GlassAppBarAction(
-            icon: Icons.notifications_none_rounded,
-            onTap: () {},
-          ),
-          GlassAppBarAction(
-            icon: Icons.search_rounded,
-            onTap: () {},
-          ),
-        ],
+        profileImageUrl: _profileAvatarUrl,
+        onProfileTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const ProfileScreen(),
+            ),
+          );
+        },
       ),
       body: Stack(
         children: [
@@ -157,6 +159,18 @@ class _MainLayoutBody extends StatelessWidget {
               _SectionTitle(
                 title: 'Overview',
                 actionLabel: 'This Week',
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  await FirestoreSeeder.seedAll();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('✅ Firestore Setup Completed'),
+                    ),
+                  );
+                },
+                child: const Text('Setup Firestore'),
               ),
               const SizedBox(height: 12),
               _OverviewGrid(currentIndex: currentIndex),
