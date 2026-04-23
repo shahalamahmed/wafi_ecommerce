@@ -22,10 +22,7 @@ class DioClient {
       ),
     );
 
-    dio.interceptors.addAll([
-      _AuthInterceptor(),
-      _LoggerInterceptor(),
-    ]);
+    dio.interceptors.addAll([_AuthInterceptor(), _LoggerInterceptor()]);
   }
 }
 
@@ -33,9 +30,9 @@ class DioClient {
 class _AuthInterceptor extends Interceptor {
   @override
   void onRequest(
-      RequestOptions options,
-      RequestInterceptorHandler handler,
-      ) async {
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     final token = await SecureStorage().getToken();
     if (token != null) {
       options.headers['Authorization'] = 'Bearer $token';
@@ -44,10 +41,7 @@ class _AuthInterceptor extends Interceptor {
   }
 
   @override
-  void onError(
-      DioException err,
-      ErrorInterceptorHandler handler,
-      ) async {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
       await SecureStorage().clearAll();
     }
@@ -58,30 +52,21 @@ class _AuthInterceptor extends Interceptor {
 // Logger Interceptor
 class _LoggerInterceptor extends Interceptor {
   @override
-  void onRequest(
-      RequestOptions options,
-      RequestInterceptorHandler handler,
-      ) {
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     // ignore: avoid_print
     print('REQUEST → ${options.method} ${options.path}');
     handler.next(options);
   }
 
   @override
-  void onResponse(
-      Response response,
-      ResponseInterceptorHandler handler,
-      ) {
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
     // ignore: avoid_print
     print('RESPONSE → ${response.statusCode}');
     handler.next(response);
   }
 
   @override
-  void onError(
-      DioException err,
-      ErrorInterceptorHandler handler,
-      ) {
+  void onError(DioException err, ErrorInterceptorHandler handler) {
     // ignore: avoid_print
     print('ERROR → ${err.message}');
     handler.next(err);

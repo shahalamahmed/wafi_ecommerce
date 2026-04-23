@@ -43,10 +43,7 @@ class SettingsScreen extends ConsumerWidget {
             },
           ),
           const SizedBox(height: 18),
-          const _SectionHeader(
-            title: 'Session',
-            subtitle: '',
-          ),
+          const _SectionHeader(title: 'Session', subtitle: ''),
           const SizedBox(height: 12),
           _LogoutCard(
             onLogout: () async {
@@ -79,10 +76,7 @@ class _LiquidSettingsHero extends StatelessWidget {
   final String storeName;
   final String email;
 
-  const _LiquidSettingsHero({
-    required this.storeName,
-    required this.email,
-  });
+  const _LiquidSettingsHero({required this.storeName, required this.email});
 
   @override
   Widget build(BuildContext context) {
@@ -97,25 +91,25 @@ class _LiquidSettingsHero extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: isDark
               ? [
-                  Colors.white.withOpacity(0.18),
-                  AppColors.primary.withOpacity(0.08),
-                  Colors.white.withOpacity(0.06),
+                  Colors.white.withValues(alpha: 0.18),
+                  AppColors.primary.withValues(alpha: 0.08),
+                  Colors.white.withValues(alpha: 0.06),
                 ]
               : [
-                  Colors.white.withOpacity(0.86),
-                  AppColors.primary.withOpacity(0.07),
-                  Colors.white.withOpacity(0.68),
+                  Colors.white.withValues(alpha: 0.86),
+                  AppColors.primary.withValues(alpha: 0.07),
+                  Colors.white.withValues(alpha: 0.68),
                 ],
         ),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.18)
-              : Colors.black.withOpacity(0.06),
+              ? Colors.white.withValues(alpha: 0.18)
+              : Colors.black.withValues(alpha: 0.06),
           width: 0.8,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.24 : 0.08),
+            color: Colors.black.withValues(alpha: isDark ? 0.24 : 0.08),
             blurRadius: 28,
             offset: const Offset(0, 18),
           ),
@@ -139,8 +133,8 @@ class _LiquidSettingsHero extends StatelessWidget {
                         shape: BoxShape.circle,
                         gradient: LinearGradient(
                           colors: [
-                            AppColors.primary.withOpacity(0.9),
-                            AppColors.purple.withOpacity(0.75),
+                            AppColors.primary.withValues(alpha: 0.9),
+                            AppColors.purple.withValues(alpha: 0.75),
                           ],
                         ),
                       ),
@@ -157,17 +151,13 @@ class _LiquidSettingsHero extends StatelessWidget {
                         children: [
                           Text(
                             'Settings',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineMedium
+                            style: Theme.of(context).textTheme.headlineMedium
                                 ?.copyWith(fontWeight: FontWeight.w700),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Liquid glass look maintain kore essential control gula ekjaygay rakha hoise.',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
+                            style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(
                                   color: AppColors.textSecondaryFor(brightness),
                                   height: 1.45,
@@ -183,30 +173,24 @@ class _LiquidSettingsHero extends StatelessWidget {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? Colors.black.withOpacity(0.16)
-                        : Colors.white.withOpacity(0.42),
+                        ? Colors.black.withValues(alpha: 0.16)
+                        : Colors.white.withValues(alpha: 0.42),
                     borderRadius: BorderRadius.circular(22),
                     border: Border.all(
                       color: isDark
-                          ? Colors.white.withOpacity(0.12)
-                          : Colors.black.withOpacity(0.05),
+                          ? Colors.white.withValues(alpha: 0.12)
+                          : Colors.black.withValues(alpha: 0.05),
                       width: 0.6,
                     ),
                   ),
                   child: Row(
                     children: [
                       Expanded(
-                        child: _HeroInfoTile(
-                          label: 'Store',
-                          value: storeName,
-                        ),
+                        child: _HeroInfoTile(label: 'Store', value: storeName),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: _HeroInfoTile(
-                          label: 'Account',
-                          value: email,
-                        ),
+                        child: _HeroInfoTile(label: 'Account', value: email),
                       ),
                     ],
                   ),
@@ -224,10 +208,7 @@ class _HeroInfoTile extends StatelessWidget {
   final String label;
   final String value;
 
-  const _HeroInfoTile({
-    required this.label,
-    required this.value,
-  });
+  const _HeroInfoTile({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -239,8 +220,8 @@ class _HeroInfoTile extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.textSecondaryFor(brightness),
-              ),
+            color: AppColors.textSecondaryFor(brightness),
+          ),
         ),
         const SizedBox(height: 8),
         Text(
@@ -248,9 +229,9 @@ class _HeroInfoTile extends StatelessWidget {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppColors.textPrimaryFor(brightness),
-                fontWeight: FontWeight.w600,
-              ),
+            color: AppColors.textPrimaryFor(brightness),
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ],
     );
@@ -261,10 +242,7 @@ class _SectionHeader extends StatelessWidget {
   final String title;
   final String subtitle;
 
-  const _SectionHeader({
-    required this.title,
-    required this.subtitle,
-  });
+  const _SectionHeader({required this.title, required this.subtitle});
 
   @override
   Widget build(BuildContext context) {
@@ -275,16 +253,16 @@ class _SectionHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 4),
         Text(
           subtitle,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondaryFor(brightness),
-              ),
+            color: AppColors.textSecondaryFor(brightness),
+          ),
         ),
       ],
     );
@@ -300,8 +278,10 @@ class _ThemeModeCard extends StatelessWidget {
     required this.onModeSelected,
   });
 
-  static const List<({ThemeMode mode, String label, String hint, IconData icon})>
-      _options = [
+  static const List<
+    ({ThemeMode mode, String label, String hint, IconData icon})
+  >
+  _options = [
     (
       mode: ThemeMode.dark,
       label: 'Dark',
@@ -378,20 +358,20 @@ class _ThemeModeOption extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: isSelected
                 ? [
-                    AppColors.primary.withOpacity(0.22),
-                    AppColors.purple.withOpacity(0.14),
+                    AppColors.primary.withValues(alpha: 0.22),
+                    AppColors.purple.withValues(alpha: 0.14),
                   ]
                 : [
-                    Colors.white.withOpacity(isDark ? 0.08 : 0.44),
-                    Colors.white.withOpacity(isDark ? 0.03 : 0.20),
+                    Colors.white.withValues(alpha: isDark ? 0.08 : 0.44),
+                    Colors.white.withValues(alpha: isDark ? 0.03 : 0.20),
                   ],
           ),
           border: Border.all(
             color: isSelected
-                ? AppColors.primary.withOpacity(0.32)
+                ? AppColors.primary.withValues(alpha: 0.32)
                 : isDark
-                    ? Colors.white.withOpacity(0.10)
-                    : Colors.black.withOpacity(0.06),
+                ? Colors.white.withValues(alpha: 0.10)
+                : Colors.black.withValues(alpha: 0.06),
             width: 0.7,
           ),
         ),
@@ -402,8 +382,8 @@ class _ThemeModeOption extends StatelessWidget {
               height: 44,
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.primary.withOpacity(0.18)
-                    : Colors.white.withOpacity(isDark ? 0.08 : 0.38),
+                    ? AppColors.primary.withValues(alpha: 0.18)
+                    : Colors.white.withValues(alpha: isDark ? 0.08 : 0.38),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(
@@ -421,17 +401,17 @@ class _ThemeModeOption extends StatelessWidget {
                   Text(
                     label,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppColors.textPrimaryFor(brightness),
-                          fontWeight: FontWeight.w600,
-                        ),
+                      color: AppColors.textPrimaryFor(brightness),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     hint,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.textSecondaryFor(brightness),
-                          height: 1.4,
-                        ),
+                      color: AppColors.textSecondaryFor(brightness),
+                      height: 1.4,
+                    ),
                   ),
                 ],
               ),
@@ -442,15 +422,13 @@ class _ThemeModeOption extends StatelessWidget {
               height: 24,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isSelected
-                    ? AppColors.primary
-                    : Colors.transparent,
+                color: isSelected ? AppColors.primary : Colors.transparent,
                 border: Border.all(
                   color: isSelected
                       ? AppColors.primary
                       : isDark
-                          ? Colors.white.withOpacity(0.25)
-                          : Colors.black.withOpacity(0.16),
+                      ? Colors.white.withValues(alpha: 0.25)
+                      : Colors.black.withValues(alpha: 0.16),
                   width: 1.4,
                 ),
               ),
@@ -489,13 +467,10 @@ class _LogoutCard extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: AppColors.error.withOpacity(0.14),
+                  color: AppColors.error.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Icon(
-                  Icons.logout_rounded,
-                  color: AppColors.error,
-                ),
+                child: const Icon(Icons.logout_rounded, color: AppColors.error),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -505,16 +480,16 @@ class _LogoutCard extends StatelessWidget {
                     Text(
                       'Logout',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: AppColors.textPrimaryFor(brightness),
-                            fontWeight: FontWeight.w600,
-                          ),
+                        color: AppColors.textPrimaryFor(brightness),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'Current session to  safely sign out',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.textSecondaryFor(brightness),
-                          ),
+                        color: AppColors.textSecondaryFor(brightness),
+                      ),
                     ),
                   ],
                 ),

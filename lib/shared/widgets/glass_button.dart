@@ -4,11 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:wafi_ecommerce/core/constants/colors.dart';
 import 'package:wafi_ecommerce/core/constants/sizes.dart';
 
-enum GlassButtonVariant {
-  primary,
-  secondary,
-  danger,
-}
+enum GlassButtonVariant { primary, secondary, danger }
 
 class GlassButton extends StatelessWidget {
   final String label;
@@ -49,7 +45,8 @@ class GlassButton extends StatelessWidget {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 220),
               height: height,
-              padding: padding ??
+              padding:
+                  padding ??
                   const EdgeInsets.symmetric(
                     horizontal: AppSizes.md,
                     vertical: AppSizes.sm,
@@ -61,13 +58,12 @@ class GlassButton extends StatelessWidget {
                   colors: scheme.gradient,
                 ),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: scheme.borderColor,
-                  width: 0.8,
-                ),
+                border: Border.all(color: scheme.borderColor, width: 0.8),
                 boxShadow: [
                   BoxShadow(
-                    color: scheme.shadowColor.withOpacity(isDark ? 0.28 : 0.14),
+                    color: scheme.shadowColor.withValues(
+                      alpha: isDark ? 0.28 : 0.14,
+                    ),
                     blurRadius: 22,
                     offset: const Offset(0, 12),
                   ),
@@ -88,11 +84,7 @@ class GlassButton extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           if (icon != null) ...[
-                            Icon(
-                              icon,
-                              size: 18,
-                              color: scheme.foregroundColor,
-                            ),
+                            Icon(icon, size: 18, color: scheme.foregroundColor),
                             const SizedBox(width: 8),
                           ],
                           Flexible(
@@ -117,10 +109,7 @@ class GlassButton extends StatelessWidget {
     );
 
     if (expand) {
-      return SizedBox(
-        width: double.infinity,
-        child: button,
-      );
+      return SizedBox(width: double.infinity, child: button);
     }
 
     return button;
@@ -170,11 +159,7 @@ class GlassDualButtonRow extends StatelessWidget {
 
     if (shouldStack) {
       return Column(
-        children: [
-          secondaryButton,
-          const SizedBox(height: 12),
-          primaryButton,
-        ],
+        children: [secondaryButton, const SizedBox(height: 12), primaryButton],
       );
     }
 
@@ -211,32 +196,34 @@ class _GlassButtonScheme {
       case GlassButtonVariant.secondary:
         return _GlassButtonScheme(
           gradient: [
-            Colors.white.withOpacity(isDark ? 0.10 : 0.72),
-            Colors.white.withOpacity(isDark ? 0.04 : 0.46),
+            Colors.white.withValues(alpha: isDark ? 0.10 : 0.72),
+            Colors.white.withValues(alpha: isDark ? 0.04 : 0.46),
           ],
           borderColor: isDark
-              ? Colors.white.withOpacity(0.14)
-              : Colors.black.withOpacity(0.08),
+              ? Colors.white.withValues(alpha: 0.14)
+              : Colors.black.withValues(alpha: 0.08),
           foregroundColor: AppColors.textPrimaryFor(brightness),
           shadowColor: Colors.black,
         );
       case GlassButtonVariant.danger:
         return _GlassButtonScheme(
           gradient: [
-            AppColors.error.withOpacity(isDark ? 0.26 : 0.18),
-            AppColors.error.withOpacity(isDark ? 0.14 : 0.10),
+            AppColors.error.withValues(alpha: isDark ? 0.26 : 0.18),
+            AppColors.error.withValues(alpha: isDark ? 0.14 : 0.10),
           ],
-          borderColor: AppColors.error.withOpacity(isDark ? 0.30 : 0.22),
+          borderColor: AppColors.error.withValues(alpha: isDark ? 0.30 : 0.22),
           foregroundColor: isDark ? Colors.white : AppColors.error,
           shadowColor: AppColors.error,
         );
       case GlassButtonVariant.primary:
         return _GlassButtonScheme(
           gradient: [
-            AppColors.primary.withOpacity(isDark ? 0.34 : 0.24),
-            AppColors.purple.withOpacity(isDark ? 0.18 : 0.12),
+            AppColors.primary.withValues(alpha: isDark ? 0.34 : 0.24),
+            AppColors.purple.withValues(alpha: isDark ? 0.18 : 0.12),
           ],
-          borderColor: AppColors.primary.withOpacity(isDark ? 0.32 : 0.22),
+          borderColor: AppColors.primary.withValues(
+            alpha: isDark ? 0.32 : 0.22,
+          ),
           foregroundColor: isDark ? Colors.white : AppColors.textPrimaryLight,
           shadowColor: AppColors.primary,
         );

@@ -1,24 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
-/// ════════════════════════════════════════════════════════════
-///  FIRESTORE SEEDER — Multi-Tenant SaaS eCommerce
+/// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+///  FIRESTORE SEEDER â€” Multi-Tenant SaaS eCommerce
 ///  Run seedAll() once to create all collections automatically
-/// ════════════════════════════════════════════════════════════
+/// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 class FirestoreSeeder {
   static final _db = FirebaseFirestore.instance;
   static final _auth = FirebaseAuth.instance;
 
-  /// ── MAIN ENTRY POINT ──────────────────────────────────────
-  /// Call this function — everything else runs automatically
+  /// â”€â”€ MAIN ENTRY POINT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  /// Call this function â€” everything else runs automatically
   static Future<void> seedAll() async {
     try {
-      print('🚀 Firestore Seeding started...\n');
+      debugPrint('ðŸš€ Firestore Seeding started...\n');
 
       final uid = _auth.currentUser?.uid;
       if (uid == null) {
-        print('❌ Error: Please login first, then run the seeder!');
+        debugPrint('âŒ Error: Please login first, then run the seeder!');
         return;
       }
 
@@ -35,60 +36,64 @@ class FirestoreSeeder {
       }
 
       // Step 1: Create Tenant
-      await _seedTenant(tenantId);
-      print('');
+      await _seedTenant(tenantId, uid);
+      debugPrint('');
 
       // Step 2: Create/Update User
       await _seedUser(uid, tenantId);
-      print('');
+      debugPrint('');
 
       // Step 3: Create Settings
       await _seedSettings(tenantId);
-      print('');
+      debugPrint('');
 
       // Step 4: Create Categories
       final categoryIds = await _seedCategories(tenantId);
-      print('');
+      debugPrint('');
 
       // Step 5: Create Brands
       final brandIds = await _seedBrands(tenantId);
-      print('');
+      debugPrint('');
 
       // Step 6: Create Products
       await _seedProducts(tenantId, categoryIds, brandIds);
-      print('');
+      debugPrint('');
 
       // Step 7: Create Customers
       final customerIds = await _seedCustomers(tenantId);
-      print('');
+      debugPrint('');
 
       // Step 8: Create Orders
       await _seedOrders(tenantId, customerIds);
-      print('');
+      debugPrint('');
 
       // Step 9: Create Suppliers
       await _seedSuppliers(tenantId);
-      print('');
+      debugPrint('');
 
       // Step 10: Create Coupons
       await _seedCoupons(tenantId);
-      print('');
+      debugPrint('');
 
-      print('════════════════════════════════════');
-      print('🎉 All collections created successfully!');
-      print('📌 Tenant ID: $tenantId');
-      print('📌 User UID:  $uid');
-      print('════════════════════════════════════');
+      debugPrint(
+        'â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•',
+      );
+      debugPrint('ðŸŽ‰ All collections created successfully!');
+      debugPrint('ðŸ“Œ Tenant ID: $tenantId');
+      debugPrint('ðŸ“Œ User UID:  $uid');
+      debugPrint(
+        'â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•',
+      );
     } catch (e) {
-      print('❌ Seeding Error: $e');
+      debugPrint('âŒ Seeding Error: $e');
     }
   }
 
-  // ══════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  1. TENANT
-  // ══════════════════════════════════════════════════════════
-  static Future<void> _seedTenant(String tenantId) async {
-    print('📦 Creating Tenant...');
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  static Future<void> _seedTenant(String tenantId, String uid) async {
+    debugPrint('ðŸ“¦ Creating Tenant...');
 
     final docRef = _db.collection('tenants').doc(tenantId);
 
@@ -96,6 +101,7 @@ class FirestoreSeeder {
       'name': 'Wafi Electronics',
       'slug': 'wafi-electronics',
       'ownerName': 'Shah Alam',
+      'ownerUid': uid,
       'email': 'shah@wafi.com',
       'phone': '01711000000',
       'address': 'Dhaka, Bangladesh',
@@ -103,7 +109,7 @@ class FirestoreSeeder {
       'favicon': '',
       'primaryColor': '#1A73E8',
       'currency': 'BDT',
-      'currencySymbol': '৳',
+      'currencySymbol': 'à§³',
       'timezone': 'Asia/Dhaka',
       'language': 'bn',
       'storeType': 'electronics',
@@ -119,14 +125,14 @@ class FirestoreSeeder {
       'updatedAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
 
-    print('   ✅ Tenant created → ID: ${docRef.id}');
+    debugPrint('   âœ… Tenant created â†’ ID: ${docRef.id}');
   }
 
-  // ══════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  2. USER + TENANT ROLE
-  // ══════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   static Future<void> _seedUser(String uid, String tenantId) async {
-    print('👤 Creating User...');
+    debugPrint('ðŸ‘¤ Creating User...');
 
     // Global user document
     await _db.collection('users').doc(uid).set({
@@ -159,21 +165,21 @@ class FirestoreSeeder {
           'updatedAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
 
-    print('   ✅ users/$uid → created');
-    print('   ✅ users/$uid/tenants/$tenantId → role: admin');
+    debugPrint('   âœ… users/$uid â†’ created');
+    debugPrint('   âœ… users/$uid/tenants/$tenantId â†’ role: admin');
   }
 
-  // ══════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  3. SETTINGS
-  // ══════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   static Future<void> _seedSettings(String tenantId) async {
-    print('⚙️  Creating Settings...');
+    debugPrint('âš™ï¸  Creating Settings...');
 
     await _db
         .collection('tenants')
         .doc(tenantId)
         .collection('settings')
-        .doc('general') // ← Fixed document ID
+        .doc('general') // â† Fixed document ID
         .set({
           'storeName': 'Wafi Electronics',
           'logo': '',
@@ -182,7 +188,7 @@ class FirestoreSeeder {
           'email': 'info@wafi.com',
           'address': 'Dhaka, Bangladesh',
           'currency': 'BDT',
-          'currencySymbol': '৳',
+          'currencySymbol': 'à§³',
           'timezone': 'Asia/Dhaka',
           'language': 'bn',
           'defaultDeliveryCharge': 100,
@@ -202,14 +208,14 @@ class FirestoreSeeder {
           'updatedAt': FieldValue.serverTimestamp(),
         });
 
-    print('   ✅ settings/general → created');
+    debugPrint('   âœ… settings/general â†’ created');
   }
 
-  // ══════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  4. CATEGORIES
-  // ══════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   static Future<Map<String, String>> _seedCategories(String tenantId) async {
-    print('📂 Creating Categories...');
+    debugPrint('ðŸ“‚ Creating Categories...');
 
     final categoriesRef = _db
         .collection('tenants')
@@ -265,17 +271,17 @@ class FirestoreSeeder {
         'updatedAt': FieldValue.serverTimestamp(),
       });
       categoryIds[cat['name'] as String] = doc.id;
-      print('   ✅ Category: ${cat['name']} → ${doc.id}');
+      debugPrint('   âœ… Category: ${cat['name']} â†’ ${doc.id}');
     }
 
     return categoryIds;
   }
 
-  // ══════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  5. BRANDS
-  // ══════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   static Future<Map<String, String>> _seedBrands(String tenantId) async {
-    print('🏷️  Creating Brands...');
+    debugPrint('ðŸ·ï¸  Creating Brands...');
 
     final brandsRef = _db
         .collection('tenants')
@@ -302,21 +308,21 @@ class FirestoreSeeder {
         'updatedAt': FieldValue.serverTimestamp(),
       });
       brandIds[brand['name'] as String] = doc.id;
-      print('   ✅ Brand: ${brand['name']} → ${doc.id}');
+      debugPrint('   âœ… Brand: ${brand['name']} â†’ ${doc.id}');
     }
 
     return brandIds;
   }
 
-  // ══════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  6. PRODUCTS + VARIANTS
-  // ══════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   static Future<void> _seedProducts(
     String tenantId,
     Map<String, String> categoryIds,
     Map<String, String> brandIds,
   ) async {
-    print('📱 Creating Products...');
+    debugPrint('ðŸ“± Creating Products...');
 
     final productsRef = _db
         .collection('tenants')
@@ -362,33 +368,33 @@ class FirestoreSeeder {
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
-    print('   ✅ Product: iPhone 15 Pro → ${iphone.id}');
+    debugPrint('   âœ… Product: iPhone 15 Pro â†’ ${iphone.id}');
 
     // iPhone Variants
     final iphoneVariants = [
       {
-        'name': '128GB — Black',
+        'name': '128GB â€” Black',
         'storage': '128GB',
         'color': 'Black',
         'price': 140000,
         'stock': 10,
       },
       {
-        'name': '256GB — Black',
+        'name': '256GB â€” Black',
         'storage': '256GB',
         'color': 'Black',
         'price': 150000,
         'stock': 8,
       },
       {
-        'name': '256GB — White',
+        'name': '256GB â€” White',
         'storage': '256GB',
         'color': 'White Titanium',
         'price': 150000,
         'stock': 7,
       },
       {
-        'name': '512GB — Black',
+        'name': '512GB â€” Black',
         'storage': '512GB',
         'color': 'Black',
         'price': 170000,
@@ -412,12 +418,12 @@ class FirestoreSeeder {
         'lowStockAlert': 3,
         'image': '',
         'isActive': true,
-        'isDefault': v['name'] == '256GB — Black',
+        'isDefault': v['name'] == '256GB â€” Black',
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       });
     }
-    print('   ✅ iPhone Variants (4 items) → created');
+    debugPrint('   âœ… iPhone Variants (4 items) â†’ created');
 
     // Product 2: Samsung Galaxy S24
     final samsung = await productsRef.add({
@@ -458,7 +464,7 @@ class FirestoreSeeder {
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
-    print('   ✅ Product: Samsung Galaxy S24 → ${samsung.id}');
+    debugPrint('   âœ… Product: Samsung Galaxy S24 â†’ ${samsung.id}');
 
     // Product 3: Sony WH-1000XM5
     await productsRef.add({
@@ -499,14 +505,14 @@ class FirestoreSeeder {
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
-    print('   ✅ Product: Sony WH-1000XM5 → created');
+    debugPrint('   âœ… Product: Sony WH-1000XM5 â†’ created');
   }
 
-  // ══════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  7. CUSTOMERS
-  // ══════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   static Future<List<String>> _seedCustomers(String tenantId) async {
-    print('👥 Creating Customers...');
+    debugPrint('ðŸ‘¥ Creating Customers...');
 
     final customersRef = _db
         .collection('tenants')
@@ -578,20 +584,20 @@ class FirestoreSeeder {
         'updatedAt': FieldValue.serverTimestamp(),
       });
       customerIds.add(doc.id);
-      print('   ✅ Customer: ${c['name']} → ${doc.id}');
+      debugPrint('   âœ… Customer: ${c['name']} â†’ ${doc.id}');
     }
 
     return customerIds;
   }
 
-  // ══════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  8. ORDERS + STATUS HISTORY
-  // ══════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   static Future<void> _seedOrders(
     String tenantId,
     List<String> customerIds,
   ) async {
-    print('🛒 Creating Orders...');
+    debugPrint('ðŸ›’ Creating Orders...');
 
     final ordersRef = _db
         .collection('tenants')
@@ -611,7 +617,7 @@ class FirestoreSeeder {
           'productId': '',
           'variantId': null,
           'name': 'iPhone 15 Pro',
-          'variantName': '256GB — Black',
+          'variantName': '256GB â€” Black',
           'thumbnail': '',
           'sku': 'IPH-15-PRO-256-BLK',
           'price': 150000,
@@ -658,7 +664,7 @@ class FirestoreSeeder {
       'deliveredAt': FieldValue.serverTimestamp(),
       'cancelledAt': null,
     });
-    print('   ✅ Order: WF-2024-0001 → ${order1.id}');
+    debugPrint('   âœ… Order: WF-2024-0001 â†’ ${order1.id}');
 
     // Status History for Order 1
     final statusHistory = [
@@ -678,7 +684,7 @@ class FirestoreSeeder {
         'changedAt': FieldValue.serverTimestamp(),
       });
     }
-    print('   ✅ Status History (4 logs) → created');
+    debugPrint('   âœ… Status History (4 logs) â†’ created');
 
     // Order 2
     final order2 = await ordersRef.add({
@@ -740,14 +746,14 @@ class FirestoreSeeder {
       'deliveredAt': null,
       'cancelledAt': null,
     });
-    print('   ✅ Order: WF-2024-0002 → ${order2.id}');
+    debugPrint('   âœ… Order: WF-2024-0002 â†’ ${order2.id}');
   }
 
-  // ══════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  9. SUPPLIERS
-  // ══════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   static Future<void> _seedSuppliers(String tenantId) async {
-    print('🏭 Creating Suppliers...');
+    debugPrint('ðŸ­ Creating Suppliers...');
 
     final suppliersRef = _db
         .collection('tenants')
@@ -769,14 +775,14 @@ class FirestoreSeeder {
       'updatedAt': FieldValue.serverTimestamp(),
     });
 
-    print('   ✅ Supplier: Global Tech Imports → created');
+    debugPrint('   âœ… Supplier: Global Tech Imports â†’ created');
   }
 
-  // ══════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  10. COUPONS
-  // ══════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   static Future<void> _seedCoupons(String tenantId) async {
-    print('🎟️  Creating Coupons...');
+    debugPrint('ðŸŽŸï¸  Creating Coupons...');
 
     final couponsRef = _db
         .collection('tenants')
@@ -821,7 +827,7 @@ class FirestoreSeeder {
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       });
-      print('   ✅ Coupon: ${c['code']} → created');
+      debugPrint('   âœ… Coupon: ${c['code']} â†’ created');
     }
   }
 }

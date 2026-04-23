@@ -18,8 +18,16 @@ class AuthBackground extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [AppColors.bgPrimary, AppColors.bgSecondary, AppColors.bgTertiary]
-              : [AppColors.bgPrimaryLight, AppColors.bgSecondaryLight, AppColors.bgTertiaryLight],
+              ? [
+                  AppColors.bgPrimary,
+                  AppColors.bgSecondary,
+                  AppColors.bgTertiary,
+                ]
+              : [
+                  AppColors.bgPrimaryLight,
+                  AppColors.bgSecondaryLight,
+                  AppColors.bgTertiaryLight,
+                ],
         ),
       ),
       child: child,
@@ -56,13 +64,17 @@ class AuthHeroHeader extends StatelessWidget {
             borderRadius: BorderRadius.circular(15),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(isDark ? 0.4 : 0.2),
+                color: AppColors.primary.withValues(alpha: isDark ? 0.4 : 0.2),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
             ],
           ),
-          child: const Icon(Icons.shopping_bag_outlined, color: Colors.white, size: 26),
+          child: const Icon(
+            Icons.shopping_bag_outlined,
+            color: Colors.white,
+            size: 26,
+          ),
         ),
         const SizedBox(height: 20),
         Text(
@@ -116,7 +128,7 @@ class AuthGlassCard extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isDark ? 0.3 : 0.06),
+                color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.06),
                 blurRadius: 30,
                 offset: const Offset(0, 10),
               ),
@@ -166,12 +178,14 @@ class AuthTextField extends StatelessWidget {
         prefixIcon: Icon(icon, size: AppSizes.iconSm),
         suffixIcon: onToggleObscure != null
             ? IconButton(
-          icon: Icon(
-            obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-            size: AppSizes.iconSm,
-          ),
-          onPressed: onToggleObscure,
-        )
+                icon: Icon(
+                  obscure
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                  size: AppSizes.iconSm,
+                ),
+                onPressed: onToggleObscure,
+              )
             : null,
       ),
     );
@@ -240,7 +254,11 @@ class GoogleSignInButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            FaIcon(FontAwesomeIcons.google, size: 18, color: const Color(0xFF4285F4)),
+            FaIcon(
+              FontAwesomeIcons.google,
+              size: 18,
+              color: const Color(0xFF4285F4),
+            ),
             const SizedBox(width: 10),
             Text(
               'Continue with Google',
@@ -271,18 +289,28 @@ class AuthErrorWidget extends StatelessWidget {
         vertical: AppSizes.sm,
       ),
       decoration: BoxDecoration(
-        color: AppColors.error.withOpacity(0.1),
+        color: AppColors.error.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-        border: Border.all(color: AppColors.error.withOpacity(0.3), width: 0.5),
+        border: Border.all(
+          color: AppColors.error.withValues(alpha: 0.3),
+          width: 0.5,
+        ),
       ),
       child: Row(
         children: [
-          const Icon(Icons.error_outline, color: AppColors.error, size: AppSizes.iconSm),
+          const Icon(
+            Icons.error_outline,
+            color: AppColors.error,
+            size: AppSizes.iconSm,
+          ),
           const SizedBox(width: AppSizes.sm),
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(color: AppColors.error, fontSize: AppSizes.fontSm),
+              style: const TextStyle(
+                color: AppColors.error,
+                fontSize: AppSizes.fontSm,
+              ),
             ),
           ),
         ],

@@ -63,7 +63,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '620954215446',
     projectId: 'wafi-commerce-8759e',
     storageBucket: 'wafi-commerce-8759e.firebasestorage.app',
-    iosClientId: '620954215446-sqb1tnt6tmfb4bd41maamq2d0t4jqr2s.apps.googleusercontent.com',
+    iosClientId:
+        '620954215446-sqb1tnt6tmfb4bd41maamq2d0t4jqr2s.apps.googleusercontent.com',
     iosBundleId: 'com.example.wafiEcommerce',
   );
 }

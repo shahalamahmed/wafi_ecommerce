@@ -1,22 +1,12 @@
 import 'package:flutter/material.dart';
 
-enum ErrorType {
-  network,
-  timeout,
-  server,
-  unauthorized,
-  notFound,
-  unknown,
-}
+enum ErrorType { network, timeout, server, unauthorized, notFound, unknown }
 
 class AppError {
   final ErrorType type;
   final String message;
 
-  AppError({
-    required this.type,
-    required this.message,
-  });
+  AppError({required this.type, required this.message});
 
   IconData get icon {
     switch (type) {

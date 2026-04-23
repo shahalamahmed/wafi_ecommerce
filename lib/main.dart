@@ -7,21 +7,16 @@ import 'app.dart';
 import 'firebase_options.dart';
 
 void main() async {
-  WidgetsBinding widgetsBinding =
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
   // Splash
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   // Firebase init
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Dio init
   DioClient();
 
-  runApp(
-    const ProviderScope(child: WafiApp()),
-  );
+  runApp(const ProviderScope(child: WafiApp()));
 }

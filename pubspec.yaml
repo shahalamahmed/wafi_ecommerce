@@ -59,7 +59,7 @@ dependencies:
 
 
 flutter_native_splash:
-  color: "#0A0A1A"
+  color: "#F7F4EE"
   android: true
   ios: true
 

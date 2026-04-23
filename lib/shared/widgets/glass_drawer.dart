@@ -32,14 +32,8 @@ class GlassDrawer extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [
-                  AppColors.bgSecondary,
-                  AppColors.bgPrimary,
-                ]
-              : [
-                  AppColors.bgSecondaryLight,
-                  AppColors.bgPrimaryLight,
-                ],
+              ? [AppColors.bgSecondary, AppColors.bgPrimary]
+              : [AppColors.bgSecondaryLight, AppColors.bgPrimaryLight],
         ),
         border: Border(
           right: BorderSide(
@@ -69,9 +63,7 @@ class GlassDrawer extends StatelessWidget {
             // Menu Items
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
                 children: [
                   _buildMenuItem(
                     index: 0,
@@ -162,7 +154,7 @@ class GlassDrawer extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withOpacity(0.4),
+                  color: AppColors.primary.withValues(alpha: 0.4),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -170,9 +162,7 @@ class GlassDrawer extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                storeName.isNotEmpty
-                    ? storeName[0].toUpperCase()
-                    : 'W',
+                storeName.isNotEmpty ? storeName[0].toUpperCase() : 'W',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -215,10 +205,14 @@ class GlassDrawer extends StatelessWidget {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(isDark ? 0.2 : 0.12),
+                    color: AppColors.primary.withValues(
+                      alpha: isDark ? 0.2 : 0.12,
+                    ),
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color: AppColors.primary.withOpacity(isDark ? 0.3 : 0.2),
+                      color: AppColors.primary.withValues(
+                        alpha: isDark ? 0.3 : 0.2,
+                      ),
                       width: 0.5,
                     ),
                   ),
@@ -258,20 +252,17 @@ class GlassDrawer extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         margin: const EdgeInsets.only(bottom: 4),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: isActive
-              ? AppColors.primary.withOpacity(0.15)
+              ? AppColors.primary.withValues(alpha: 0.15)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(14),
           border: isActive
               ? Border.all(
-            color: AppColors.primary.withOpacity(0.25),
-            width: 0.5,
-          )
+                  color: AppColors.primary.withValues(alpha: 0.25),
+                  width: 0.5,
+                )
               : null,
         ),
         child: Row(
@@ -291,9 +282,7 @@ class GlassDrawer extends StatelessWidget {
                     ? AppColors.primary
                     : AppColors.textSecondaryFor(brightness),
                 fontSize: AppSizes.fontMd,
-                fontWeight: isActive
-                    ? FontWeight.w600
-                    : FontWeight.w400,
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
               ),
             ),
             if (isActive) ...[
@@ -321,27 +310,20 @@ class GlassDrawer extends StatelessWidget {
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 12),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: AppColors.error.withOpacity(0.1),
+          color: AppColors.error.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: AppColors.error.withOpacity(
-              brightness == Brightness.dark ? 0.2 : 0.25,
+            color: AppColors.error.withValues(
+              alpha: brightness == Brightness.dark ? 0.2 : 0.25,
             ),
             width: 0.5,
           ),
         ),
         child: const Row(
           children: [
-            Icon(
-              Icons.logout_rounded,
-              color: AppColors.error,
-              size: 20,
-            ),
+            Icon(Icons.logout_rounded, color: AppColors.error, size: 20),
             SizedBox(width: 14),
             Text(
               'Logout',

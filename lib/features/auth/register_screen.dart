@@ -55,15 +55,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       return;
     }
 
-    final tenantId =
-        '${_storeNameController.text.toLowerCase().replaceAll(' ', '_')}_${DateTime.now().millisecondsSinceEpoch}';
+    const tenantId = 'wafi_store_1776856408474';
 
-    await ref.read(authControllerProvider.notifier).register(
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-      tenantId: tenantId,
-      role: 'admin',
-    );
+    await ref
+        .read(authControllerProvider.notifier)
+        .register(
+          storeName: _storeNameController.text.trim(),
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+          tenantId: tenantId,
+          role: 'admin',
+        );
 
     if (!mounted) return;
 

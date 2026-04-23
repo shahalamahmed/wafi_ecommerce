@@ -16,16 +16,14 @@ class SnackbarMessage {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: _GlassSnackbarContent(
-            message: message,
-            isError: isError,
-          ),
+          content: _GlassSnackbarContent(message: message, isError: isError),
           backgroundColor: Colors.transparent,
           behavior: SnackBarBehavior.floating,
           elevation: 0,
           margin: const EdgeInsets.all(16),
           duration: const Duration(seconds: 3),
-          padding: EdgeInsets.zero, // Content নিজেই padding handle করবে
+          padding: EdgeInsets
+              .zero, // Content à¦¨à¦¿à¦œà§‡à¦‡ padding handle à¦•à¦°à¦¬à§‡
         ),
       );
   }
@@ -35,10 +33,7 @@ class _GlassSnackbarContent extends StatelessWidget {
   final String message;
   final bool isError;
 
-  const _GlassSnackbarContent({
-    required this.message,
-    required this.isError,
-  });
+  const _GlassSnackbarContent({required this.message, required this.isError});
 
   @override
   Widget build(BuildContext context) {
@@ -51,23 +46,23 @@ class _GlassSnackbarContent extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.25), // Semi-transparent background
+            color: color.withValues(alpha: 0.25), // Semi-transparent background
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: color.withOpacity(0.5), // Glass border
+              color: color.withValues(alpha: 0.5), // Glass border
               width: 1.2,
             ),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                color.withOpacity(0.35),
-                color.withOpacity(0.15),
+                color.withValues(alpha: 0.35),
+                color.withValues(alpha: 0.15),
               ],
             ),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.3),
+                color: color.withValues(alpha: 0.3),
                 blurRadius: 12,
                 spreadRadius: 1,
               ),
@@ -79,7 +74,7 @@ class _GlassSnackbarContent extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
+                  color: Colors.white.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(

@@ -13,17 +13,12 @@ class GlassBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = Theme
-        .of(context)
-        .brightness;
+    final brightness = Theme.of(context).brightness;
     final isDark = brightness == Brightness.dark;
 
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 12,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: AppColors.glassSurfaceFor(brightness),
         borderRadius: BorderRadius.circular(32),
@@ -33,7 +28,7 @@ class GlassBottomNav extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.08),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
             blurRadius: 50,
             offset: const Offset(0, 10),
           ),
@@ -64,6 +59,13 @@ class GlassBottomNav extends StatelessWidget {
             brightness: brightness,
           ),
           _buildNavItem(
+            index: 3,
+            icon: Icons.people_outline_rounded,
+            activeIcon: Icons.people_rounded,
+            label: 'Customers',
+            brightness: brightness,
+          ),
+          _buildNavItem(
             index: 4,
             icon: Icons.settings_outlined,
             activeIcon: Icons.settings_rounded,
@@ -89,16 +91,12 @@ class GlassBottomNav extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 7,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
           color: isActive
-              ? AppColors.primary.withOpacity(0.18)
+              ? AppColors.primary.withValues(alpha: 0.18)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
-
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -115,8 +113,7 @@ class GlassBottomNav extends StatelessWidget {
               duration: const Duration(milliseconds: 200),
               style: TextStyle(
                 fontSize: 9,
-                fontWeight:
-                isActive ? FontWeight.w600 : FontWeight.w400,
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
                 color: isActive
                     ? AppColors.primary
                     : AppColors.textHintFor(brightness),

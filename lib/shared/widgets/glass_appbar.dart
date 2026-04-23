@@ -29,6 +29,7 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final brightness = Theme.of(context).brightness;
+    final leadingWidgets = leading == null ? null : <Widget>[leading!];
 
     return Container(
       decoration: BoxDecoration(
@@ -36,14 +37,8 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: brightness == Brightness.dark
-              ? [
-                  const Color(0xCC0E1430),
-                  const Color(0xB3191338),
-                ]
-              : [
-                  Colors.white.withOpacity(0.92),
-                  const Color(0xFFF1F4FF),
-                ],
+              ? [const Color(0xCC101317), const Color(0xB31A1F26)]
+              : [Colors.white.withValues(alpha: 0.96), const Color(0xFFF7F4EE)],
         ),
         border: Border(
           bottom: BorderSide(
@@ -53,8 +48,8 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(
-              brightness == Brightness.dark ? 0.18 : 0.05,
+            color: Colors.black.withValues(
+              alpha: brightness == Brightness.dark ? 0.18 : 0.05,
             ),
             blurRadius: 18,
             offset: const Offset(0, 8),
@@ -76,8 +71,8 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
                   icon: Icons.arrow_back_ios_rounded,
                   onTap: () => Navigator.pop(context),
                 )
-              else if (leading != null)
-                leading!,
+              else
+                ...?leadingWidgets,
 
               if (showBackButton || leading != null) const SizedBox(width: 12),
 
@@ -91,14 +86,11 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFF4F46E5),
-                            Color(0xFF7C3AED),
-                          ],
+                          colors: [AppColors.primary, AppColors.purple],
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF4F46E5).withOpacity(0.18),
+                            color: AppColors.primary.withValues(alpha: 0.18),
                             blurRadius: 14,
                             offset: const Offset(0, 6),
                           ),
@@ -144,10 +136,10 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
 
               // Actions
-              if (actions != null) ...actions!,
-              if (profileImageUrl != null)
+              ...?actions,
+              if (profileImageUrl case final imageUrl?)
                 GlassProfileAvatarAction(
-                  imageUrl: profileImageUrl!,
+                  imageUrl: imageUrl,
                   onTap: onProfileTap ?? () {},
                 ),
             ],
@@ -250,9 +242,9 @@ class GlassProfileAvatarAction extends StatelessWidget {
             shape: BoxShape.circle,
             gradient: LinearGradient(
               colors: [
-                Color(0xFF4F46E5),
-                Color(0xFF7C3AED),
-                Color(0xFFA855F7),
+                AppColors.primary,
+                AppColors.purple,
+                AppColors.primaryDark,
               ],
             ),
           ),

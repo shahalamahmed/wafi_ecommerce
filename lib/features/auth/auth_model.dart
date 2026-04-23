@@ -1,10 +1,4 @@
-enum AuthStatus {
-  initial,
-  loading,
-  authenticated,
-  unauthenticated,
-  error,
-}
+enum AuthStatus { initial, loading, authenticated, unauthenticated, error }
 
 class AuthModel {
   final AuthStatus status;
@@ -40,7 +34,6 @@ class AuthModel {
     String? photoUrl,
     String? coverUrl,
     String? errorMessage,
-
   }) {
     return AuthModel(
       status: status ?? this.status,

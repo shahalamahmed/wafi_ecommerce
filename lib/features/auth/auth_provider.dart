@@ -45,6 +45,7 @@ class AuthController extends StateNotifier<AuthModel> {
   }
 
   Future<void> register({
+    required String storeName,
     required String email,
     required String password,
     required String tenantId,
@@ -53,6 +54,7 @@ class AuthController extends StateNotifier<AuthModel> {
     state = state.copyWith(status: AuthStatus.loading);
 
     final result = await _authService.register(
+      storeName: storeName,
       email: email,
       password: password,
       tenantId: tenantId,

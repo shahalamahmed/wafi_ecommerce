@@ -1,0 +1,119 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function userTenantDoc(tenantId) {
+      return /databases/$(database)/documents/users/$(request.auth.uid)/tenants/$(tenantId);
+    }
+
+    function tenantDoc(tenantId) {
+      return /databases/$(database)/documents/tenants/$(tenantId);
+    }
+
+    function isTenantMember(tenantId) {
+      return signedIn()
+        && exists(userTenantDoc(tenantId))
+        && get(userTenantDoc(tenantId)).data.isActive == true;
+    }
+
+    function tenantRole(tenantId) {
+      return get(userTenantDoc(tenantId)).data.role;
+    }
+
+    function isAdmin(tenantId) {
+      return isTenantMember(tenantId) && tenantRole(tenantId) == 'admin';
+    }
+
+    function isManager(tenantId) {
+      return isTenantMember(tenantId) && tenantRole(tenantId) == 'manager';
+    }
+
+    function canWriteTenant(tenantId) {
+      return isAdmin(tenantId) || isManager(tenantId);
+    }
+
+    function canManageOrders(tenantId) {
+      return canWriteTenant(tenantId) || (isTenantMember(tenantId) && tenantRole(tenantId) == 'staff');
+    }
+
+    match /users/{uid} {
+      allow read, create, update, delete: if signedIn() && request.auth.uid == uid;
+
+      match /tenants/{tenantId} {
+        allow read, create, update, delete: if signedIn() && request.auth.uid == uid;
+      }
+    }
+
+    match /tenants/{tenantId} {
+      allow read: if isTenantMember(tenantId);
+      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
+      allow update: if canWriteTenant(tenantId);
+      allow delete: if isAdmin(tenantId);
+
+      match /settings/{settingId} {
+        allow read: if isTenantMember(tenantId);
+        allow create, update, delete: if canWriteTenant(tenantId);
+      }
+
+      match /products/{productId} {
+        allow read: if isTenantMember(tenantId);
+        allow create, update, delete: if canWriteTenant(tenantId);
+
+        match /variants/{variantId} {
+          allow read: if isTenantMember(tenantId);
+          allow create, update, delete: if canWriteTenant(tenantId);
+        }
+      }
+
+      match /orders/{orderId} {
+        allow read: if isTenantMember(tenantId);
+        allow create, update: if canManageOrders(tenantId);
+        allow delete: if isAdmin(tenantId);
+
+        match /statusHistory/{historyId} {
+          allow read: if isTenantMember(tenantId);
+          allow create, update, delete: if canManageOrders(tenantId);
+        }
+      }
+
+      match /customers/{customerId} {
+        allow read: if isTenantMember(tenantId);
+        allow create, update: if canManageOrders(tenantId);
+        allow delete: if canWriteTenant(tenantId);
+      }
+
+      match /categories/{categoryId} {
+        allow read: if isTenantMember(tenantId);
+        allow write: if canWriteTenant(tenantId);
+      }
+
+      match /brands/{brandId} {
+        allow read: if isTenantMember(tenantId);
+        allow write: if canWriteTenant(tenantId);
+      }
+
+      match /suppliers/{supplierId} {
+        allow read: if isTenantMember(tenantId);
+        allow write: if canWriteTenant(tenantId);
+      }
+
+      match /coupons/{couponId} {
+        allow read: if isTenantMember(tenantId);
+        allow write: if canWriteTenant(tenantId);
+      }
+
+      match /reports/{reportId} {
+        allow read: if isTenantMember(tenantId);
+        allow create, update, delete: if canWriteTenant(tenantId);
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

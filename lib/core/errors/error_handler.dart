@@ -81,9 +81,7 @@ class ErrorHandler {
           if (statusCode == 401) {
             return AppError(
               type: ErrorType.unauthorized,
-              message: message.isNotEmpty
-                  ? message
-                  : 'Invalid credentials.',
+              message: message.isNotEmpty ? message : 'Invalid credentials.',
             );
           }
           if (statusCode == 403) {
@@ -97,9 +95,7 @@ class ErrorHandler {
           if (statusCode == 404) {
             return AppError(
               type: ErrorType.notFound,
-              message: message.isNotEmpty
-                  ? message
-                  : 'Resource not found.',
+              message: message.isNotEmpty ? message : 'Resource not found.',
             );
           }
           return AppError(
@@ -127,10 +123,7 @@ class ErrorHandler {
       message = message.replaceFirst('Exception: ', '');
     }
 
-    return AppError(
-      type: ErrorType.unknown,
-      message: message,
-    );
+    return AppError(type: ErrorType.unknown, message: message);
   }
 
   // Extract message from response data

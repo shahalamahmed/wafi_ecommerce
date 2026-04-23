@@ -11,20 +11,36 @@ import 'package:wafi_ecommerce/core/constants/sizes.dart';
 import 'package:wafi_ecommerce/features/auth/auth_provider.dart';
 import 'package:wafi_ecommerce/shared/widgets/snackbar_message.dart';
 
-// ─── Firestore stream provider ────────────────────────────────────────────────
+// â”€â”€â”€ Firestore stream provider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 final _profileStreamProvider =
-StreamProvider.family<Map<String, dynamic>?, String>((ref, uid) {
-  if (uid.isEmpty) return Stream.value(null);
-  return FirebaseFirestore.instance
-      .collection('users')
-      .doc(uid)
-      .snapshots()
-      .map((s) => s.data());
-});
+    StreamProvider.family<Map<String, dynamic>?, String>((ref, uid) {
+      if (uid.isEmpty) return Stream.value(null);
+      return FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .snapshots()
+          .map((s) => s.data());
+    });
 
 const _coverSeeds = [
-  10, 18, 22, 33, 44, 55, 66, 77, 88, 99,
-  110, 121, 132, 143, 154, 165, 176, 187,
+  10,
+  18,
+  22,
+  33,
+  44,
+  55,
+  66,
+  77,
+  88,
+  99,
+  110,
+  121,
+  132,
+  143,
+  154,
+  165,
+  176,
+  187,
 ];
 
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -40,29 +56,35 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Future<void> _changeProfilePhoto(String uid) async {
     final picker = ImagePicker();
-    final picked =
-    await picker.pickImage(source: ImageSource.gallery, imageQuality: 82);
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 82,
+    );
     if (picked == null || !mounted) return;
 
     setState(() => _uploadingPhoto = true);
     try {
       final file = File(picked.path);
-      final storageRef =
-      FirebaseStorage.instance.ref('profile_photos/$uid.jpg');
+      final storageRef = FirebaseStorage.instance.ref(
+        'profile_photos/$uid.jpg',
+      );
       await storageRef.putFile(file);
       final url = await storageRef.getDownloadURL();
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .update({'photoUrl': url});
+      await FirebaseFirestore.instance.collection('users').doc(uid).update({
+        'photoUrl': url,
+      });
       if (mounted) {
         SnackbarMessage.show(
-            context: context, message: 'Profile photo updated ✓');
+          context: context,
+          message: 'Profile photo updated âœ“',
+        );
       }
     } catch (_) {
       if (mounted) {
         SnackbarMessage.show(
-            context: context, message: 'Failed to update photo.');
+          context: context,
+          message: 'Failed to update photo.',
+        );
       }
     } finally {
       if (mounted) setState(() => _uploadingPhoto = false);
@@ -72,19 +94,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Future<void> _setCoverPhoto(String uid, String imageUrl) async {
     setState(() => _pendingCoverUrl = imageUrl);
     try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .update({'coverUrl': imageUrl});
+      await FirebaseFirestore.instance.collection('users').doc(uid).update({
+        'coverUrl': imageUrl,
+      });
       if (mounted) {
         SnackbarMessage.show(
-            context: context, message: 'Cover photo updated ✓');
+          context: context,
+          message: 'Cover photo updated âœ“',
+        );
       }
     } catch (_) {
       if (mounted) {
         setState(() => _pendingCoverUrl = null);
         SnackbarMessage.show(
-            context: context, message: 'Failed to update cover.');
+          context: context,
+          message: 'Failed to update cover.',
+        );
       }
     }
   }
@@ -102,8 +127,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       data: (data) {
         final email = data?['email'] as String? ?? authState.email ?? '';
         final photoUrl = data?['photoUrl'] as String?;
-        final coverUrl =
-            _pendingCoverUrl ?? data?['coverUrl'] as String?;
+        final coverUrl = _pendingCoverUrl ?? data?['coverUrl'] as String?;
         final tenantId =
             data?['tenantId'] as String? ?? authState.tenantId ?? 'Wafi Store';
         final role = data?['role'] as String? ?? authState.role ?? 'admin';
@@ -184,7 +208,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 }
 
-// ─── Backdrop ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Backdrop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class _ProfileBackdrop extends StatelessWidget {
   final bool isDark;
   const _ProfileBackdrop({required this.isDark});
@@ -200,8 +224,16 @@ class _ProfileBackdrop extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: isDark
-                  ? [AppColors.bgSecondary, AppColors.bgPrimary, AppColors.bgTertiary]
-                  : [AppColors.bgSecondaryLight, AppColors.bgPrimaryLight, AppColors.bgTertiaryLight],
+                  ? [
+                      AppColors.bgSecondary,
+                      AppColors.bgPrimary,
+                      AppColors.bgTertiary,
+                    ]
+                  : [
+                      AppColors.bgSecondaryLight,
+                      AppColors.bgPrimaryLight,
+                      AppColors.bgTertiaryLight,
+                    ],
             ),
           ),
         ),
@@ -209,15 +241,17 @@ class _ProfileBackdrop extends StatelessWidget {
           top: -80,
           right: -60,
           child: _GlowOrb(
-              size: 240,
-              color: AppColors.primary.withOpacity(isDark ? 0.22 : 0.14)),
+            size: 240,
+            color: AppColors.primary.withValues(alpha: isDark ? 0.22 : 0.14),
+          ),
         ),
         Positioned(
           bottom: 120,
           left: -60,
           child: _GlowOrb(
-              size: 200,
-              color: AppColors.purple.withOpacity(isDark ? 0.18 : 0.10)),
+            size: 200,
+            color: AppColors.purple.withValues(alpha: isDark ? 0.18 : 0.10),
+          ),
         ),
       ],
     );
@@ -244,7 +278,7 @@ class _GlowOrb extends StatelessWidget {
   }
 }
 
-// ─── Cover header ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Cover header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class _CoverHeader extends StatelessWidget {
   final String? coverUrl;
   final bool isDark;
@@ -264,10 +298,11 @@ class _CoverHeader extends StatelessWidget {
         // Cover image or placeholder
         coverUrl != null
             ? Image.network(
-          coverUrl!,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _CoverPlaceholder(isDark: isDark),
-        )
+                coverUrl!,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    _CoverPlaceholder(isDark: isDark),
+              )
             : _CoverPlaceholder(isDark: isDark),
 
         // Gradient overlay
@@ -276,11 +311,7 @@ class _CoverHeader extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                Color(0x440F172A),
-                Color(0x000F172A),
-                Color(0xCC0F172A),
-              ],
+              colors: [Color(0x440F172A), Color(0x000F172A), Color(0xCC0F172A)],
               stops: [0.0, 0.42, 1.0],
             ),
           ),
@@ -317,7 +348,7 @@ class _CoverHeader extends StatelessWidget {
               Text(
                 'Tap a photo below to update your cover.',
                 style: GoogleFonts.poppins(
-                  color: Colors.white.withOpacity(0.72),
+                  color: Colors.white.withValues(alpha: 0.72),
                   fontSize: AppSizes.fontMd,
                   fontWeight: FontWeight.w400,
                 ),
@@ -350,7 +381,7 @@ class _CoverPlaceholder extends StatelessWidget {
   }
 }
 
-// ─── Profile card ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Profile card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class _ProfileCard extends StatelessWidget {
   final String email;
   final String tenantId;
@@ -389,23 +420,23 @@ class _ProfileCard extends StatelessWidget {
                 filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                 child: Container(
                   width: double.infinity,
-                  padding:
-                  const EdgeInsets.fromLTRB(20, 80, 20, 24),
+                  padding: const EdgeInsets.fromLTRB(20, 80, 20, 24),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? Colors.white.withOpacity(0.07)
-                        : Colors.white.withOpacity(0.72),
+                        ? Colors.white.withValues(alpha: 0.07)
+                        : Colors.white.withValues(alpha: 0.72),
                     borderRadius: BorderRadius.circular(28),
                     border: Border.all(
                       color: isDark
-                          ? Colors.white.withOpacity(0.14)
-                          : Colors.black.withOpacity(0.06),
+                          ? Colors.white.withValues(alpha: 0.14)
+                          : Colors.black.withValues(alpha: 0.06),
                       width: 0.8,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF4F46E5)
-                            .withOpacity(isDark ? 0.18 : 0.08),
+                        color: const Color(
+                          0xFF4F46E5,
+                        ).withValues(alpha: isDark ? 0.18 : 0.08),
                         blurRadius: 30,
                         offset: const Offset(0, 18),
                       ),
@@ -453,7 +484,7 @@ class _ProfileCard extends StatelessWidget {
                       _InfoRow(
                         icon: Icons.fingerprint_rounded,
                         value: uid.length > 20
-                            ? '${uid.substring(0, 20)}…'
+                            ? '${uid.substring(0, 20)}â€¦'
                             : uid,
                         isDark: isDark,
                       ),
@@ -496,7 +527,7 @@ class _ProfileCard extends StatelessWidget {
   }
 }
 
-// ─── Avatar with upload button ────────────────────────────────────────────────
+// â”€â”€â”€ Avatar with upload button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class _AvatarWithUpload extends StatelessWidget {
   final String? photoUrl;
   final bool uploading;
@@ -519,11 +550,7 @@ class _AvatarWithUpload extends StatelessWidget {
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
             gradient: LinearGradient(
-              colors: [
-                Color(0xFF4F46E5),
-                Color(0xFF7C3AED),
-                Color(0xFFA855F7),
-              ],
+              colors: [Color(0xFF4F46E5), Color(0xFF7C3AED), Color(0xFFA855F7)],
             ),
           ),
           child: CircleAvatar(
@@ -532,14 +559,15 @@ class _AvatarWithUpload extends StatelessWidget {
             child: CircleAvatar(
               radius: 52,
               backgroundColor: const Color(0xFFEDE9FE),
-              backgroundImage:
-              photoUrl != null ? NetworkImage(photoUrl!) : null,
+              backgroundImage: photoUrl != null
+                  ? NetworkImage(photoUrl!)
+                  : null,
               child: photoUrl == null
                   ? const Icon(
-                Icons.person_rounded,
-                size: 44,
-                color: Color(0xFF7C3AED),
-              )
+                      Icons.person_rounded,
+                      size: 44,
+                      color: Color(0xFF7C3AED),
+                    )
                   : null,
             ),
           ),
@@ -582,7 +610,7 @@ class _AvatarWithUpload extends StatelessWidget {
                 border: Border.all(color: Colors.white, width: 2),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF7C3AED).withOpacity(0.35),
+                    color: const Color(0xFF7C3AED).withValues(alpha: 0.35),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),
@@ -600,7 +628,7 @@ class _AvatarWithUpload extends StatelessWidget {
   }
 }
 
-// ─── Info row ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Info row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class _InfoRow extends StatelessWidget {
   final IconData icon;
   final String value;
@@ -621,7 +649,7 @@ class _InfoRow extends StatelessWidget {
           height: 38,
           decoration: BoxDecoration(
             color: isDark
-                ? const Color(0xFF4F46E5).withOpacity(0.18)
+                ? const Color(0xFF4F46E5).withValues(alpha: 0.18)
                 : const Color(0xFFF5F3FF),
             borderRadius: BorderRadius.circular(12),
           ),
@@ -632,7 +660,9 @@ class _InfoRow extends StatelessWidget {
           child: Text(
             value,
             style: GoogleFonts.poppins(
-              color: isDark ? Colors.white.withOpacity(0.82) : const Color(0xFF334155),
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.82)
+                  : const Color(0xFF334155),
               fontSize: AppSizes.fontMd,
               fontWeight: FontWeight.w500,
             ),
@@ -643,7 +673,7 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-// ─── Role badge ───────────────────────────────────────────────────────────────
+// â”€â”€â”€ Role badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class _RoleBadge extends StatelessWidget {
   final String role;
   const _RoleBadge({required this.role});
@@ -659,7 +689,7 @@ class _RoleBadge extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF7C3AED).withOpacity(0.28),
+            color: const Color(0xFF7C3AED).withValues(alpha: 0.28),
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -678,7 +708,7 @@ class _RoleBadge extends StatelessWidget {
   }
 }
 
-// ─── Glass tab bar ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Glass tab bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class _GlassTabBar extends StatelessWidget {
   final bool isDark;
   const _GlassTabBar({required this.isDark});
@@ -694,13 +724,13 @@ class _GlassTabBar extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               color: isDark
-                  ? Colors.white.withOpacity(0.08)
-                  : Colors.white.withOpacity(0.75),
+                  ? Colors.white.withValues(alpha: 0.08)
+                  : Colors.white.withValues(alpha: 0.75),
               borderRadius: BorderRadius.circular(18),
               border: Border.all(
                 color: isDark
-                    ? Colors.white.withOpacity(0.14)
-                    : Colors.black.withOpacity(0.06),
+                    ? Colors.white.withValues(alpha: 0.14)
+                    : Colors.black.withValues(alpha: 0.06),
                 width: 0.8,
               ),
             ),
@@ -728,7 +758,7 @@ class _GlassTabBar extends StatelessWidget {
   }
 }
 
-// ─── Pinned tab delegate ──────────────────────────────────────────────────────
+// â”€â”€â”€ Pinned tab delegate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class _PinnedTabDelegate extends SliverPersistentHeaderDelegate {
   final Widget child;
   final bool isDark;
@@ -745,8 +775,8 @@ class _PinnedTabDelegate extends SliverPersistentHeaderDelegate {
   Widget build(BuildContext ctx, double shrinkOffset, bool overlapsContent) {
     return ColoredBox(
       color: isDark
-          ? AppColors.bgPrimary.withOpacity(0.82)
-          : AppColors.bgPrimaryLight.withOpacity(0.82),
+          ? AppColors.bgPrimary.withValues(alpha: 0.82)
+          : AppColors.bgPrimaryLight.withValues(alpha: 0.82),
       child: child,
     );
   }
@@ -756,7 +786,7 @@ class _PinnedTabDelegate extends SliverPersistentHeaderDelegate {
       old.isDark != isDark || old.child != child;
 }
 
-// ─── Cover picker grid ────────────────────────────────────────────────────────
+// â”€â”€â”€ Cover picker grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class _CoverPickerGrid extends StatelessWidget {
   final String uid;
   final String? activeCoverUrl;
@@ -795,19 +825,17 @@ class _CoverPickerGrid extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: isActive
-                    ? const Color(0xFF7C3AED)
-                    : Colors.transparent,
+                color: isActive ? const Color(0xFF7C3AED) : Colors.transparent,
                 width: isActive ? 3 : 0,
               ),
               boxShadow: isActive
                   ? [
-                BoxShadow(
-                  color: const Color(0xFF7C3AED).withOpacity(0.38),
-                  blurRadius: 18,
-                  offset: const Offset(0, 8),
-                ),
-              ]
+                      BoxShadow(
+                        color: const Color(0xFF7C3AED).withValues(alpha: 0.38),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
+                      ),
+                    ]
                   : [],
             ),
             child: ClipRRect(
@@ -818,14 +846,13 @@ class _CoverPickerGrid extends StatelessWidget {
                   Image.network(
                     imageUrl,
                     fit: BoxFit.cover,
-                    loadingBuilder: (ctx, child, progress) =>
-                    progress == null
+                    loadingBuilder: (ctx, child, progress) => progress == null
                         ? child
                         : Container(
-                      color: isDark
-                          ? Colors.white.withOpacity(0.05)
-                          : Colors.black.withOpacity(0.05),
-                    ),
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.05)
+                                : Colors.black.withValues(alpha: 0.05),
+                          ),
                   ),
                   // Subtle overlay
                   const DecoratedBox(
@@ -833,10 +860,7 @@ class _CoverPickerGrid extends StatelessWidget {
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [
-                          Color(0x00000000),
-                          Color(0x44000000),
-                        ],
+                        colors: [Color(0x00000000), Color(0x44000000)],
                       ),
                     ),
                   ),
@@ -869,7 +893,7 @@ class _CoverPickerGrid extends StatelessWidget {
   }
 }
 
-// ─── Glass circle control ─────────────────────────────────────────────────────
+// â”€â”€â”€ Glass circle control â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class _GlassCircleControl extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
@@ -888,10 +912,8 @@ class _GlassCircleControl extends StatelessWidget {
             height: 42,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.16),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.38),
-              ),
+              color: Colors.white.withValues(alpha: 0.16),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.38)),
             ),
             child: Icon(icon, color: Colors.white, size: 18),
           ),
@@ -901,7 +923,7 @@ class _GlassCircleControl extends StatelessWidget {
   }
 }
 
-// ─── Loading / Error screens ──────────────────────────────────────────────────
+// â”€â”€â”€ Loading / Error screens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class _LoadingScreen extends StatelessWidget {
   final bool isDark;
   const _LoadingScreen({required this.isDark});

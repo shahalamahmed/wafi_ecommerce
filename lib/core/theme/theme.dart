@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wafi_ecommerce/core/constants/sizes.dart';
 import 'package:wafi_ecommerce/core/constants/colors.dart';
-import 'package:wafi_ecommerce/core/constants/strings.dart';
+import 'package:wafi_ecommerce/core/constants/sizes.dart';
+
 class AppTheme {
   AppTheme._();
 
@@ -36,9 +36,7 @@ class AppTheme {
           fontWeight: FontWeight.w600,
           letterSpacing: -0.3,
         ),
-        iconTheme: IconThemeData(
-          color: AppColors.textPrimary,
-        ),
+        iconTheme: IconThemeData(color: AppColors.textPrimary),
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.light,
@@ -120,10 +118,7 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.textPrimary,
           minimumSize: const Size(double.infinity, AppSizes.buttonHeight),
-          side: const BorderSide(
-            color: AppColors.glassBorder,
-            width: 0.5,
-          ),
+          side: const BorderSide(color: AppColors.glassBorder, width: 0.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSizes.buttonRadius),
           ),
@@ -169,17 +164,11 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSizes.inputRadius),
-          borderSide: const BorderSide(
-            color: AppColors.primary,
-            width: 1.0,
-          ),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.0),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSizes.inputRadius),
-          borderSide: const BorderSide(
-            color: AppColors.error,
-            width: 0.5,
-          ),
+          borderSide: const BorderSide(color: AppColors.error, width: 0.5),
         ),
         hintStyle: const TextStyle(
           color: AppColors.textHint,
@@ -199,10 +188,7 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-          side: const BorderSide(
-            color: AppColors.glassBorder,
-            width: 0.5,
-          ),
+          side: const BorderSide(color: AppColors.glassBorder, width: 0.5),
         ),
         margin: EdgeInsets.zero,
       ),
@@ -246,10 +232,7 @@ class AppTheme {
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-          side: const BorderSide(
-            color: AppColors.glassBorder,
-            width: 0.5,
-          ),
+          side: const BorderSide(color: AppColors.glassBorder, width: 0.5),
         ),
         behavior: SnackBarBehavior.floating,
       ),
@@ -264,7 +247,7 @@ class AppTheme {
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.primary.withOpacity(0.3);
+            return AppColors.primary.withValues(alpha: 0.3);
           }
           return AppColors.glassSurface;
         }),
@@ -301,9 +284,7 @@ class AppTheme {
           fontWeight: FontWeight.w600,
           letterSpacing: -0.3,
         ),
-        iconTheme: IconThemeData(
-          color: AppColors.textPrimaryLight,
-        ),
+        iconTheme: IconThemeData(color: AppColors.textPrimaryLight),
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.dark,
@@ -382,10 +363,7 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.textPrimaryLight,
           minimumSize: const Size(double.infinity, AppSizes.buttonHeight),
-          side: const BorderSide(
-            color: AppColors.glassBorderLight,
-            width: 0.5,
-          ),
+          side: const BorderSide(color: AppColors.glassBorderLight, width: 0.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSizes.buttonRadius),
           ),
@@ -429,17 +407,11 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSizes.inputRadius),
-          borderSide: const BorderSide(
-            color: AppColors.primary,
-            width: 1.0,
-          ),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.0),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSizes.inputRadius),
-          borderSide: const BorderSide(
-            color: AppColors.error,
-            width: 0.5,
-          ),
+          borderSide: const BorderSide(color: AppColors.error, width: 0.5),
         ),
         hintStyle: const TextStyle(
           color: AppColors.textHintLight,
@@ -458,10 +430,7 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-          side: const BorderSide(
-            color: AppColors.glassBorderLight,
-            width: 0.5,
-          ),
+          side: const BorderSide(color: AppColors.glassBorderLight, width: 0.5),
         ),
         margin: EdgeInsets.zero,
       ),
@@ -501,10 +470,7 @@ class AppTheme {
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-          side: const BorderSide(
-            color: AppColors.glassBorderLight,
-            width: 0.5,
-          ),
+          side: const BorderSide(color: AppColors.glassBorderLight, width: 0.5),
         ),
         behavior: SnackBarBehavior.floating,
       ),
@@ -518,7 +484,7 @@ class AppTheme {
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.primary.withOpacity(0.3);
+            return AppColors.primary.withValues(alpha: 0.3);
           }
           return AppColors.glassSurfaceLight;
         }),
