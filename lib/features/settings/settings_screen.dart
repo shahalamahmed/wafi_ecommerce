@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wafi_ecommerce/core/constants/colors.dart';
-import 'package:wafi_ecommerce/core/providers.dart';
-import 'package:wafi_ecommerce/core/theme/theme_provider.dart';
-import 'package:wafi_ecommerce/core/utils/firestore_seeder.dart';
+import 'package:wafi_ecommerce/core/config/theme/theme_provider.dart';
+import 'package:wafi_ecommerce/core/utils/seeder.dart';
+import 'package:wafi_ecommerce/features/tenant/tenant_provider.dart';
 import 'package:wafi_ecommerce/features/auth/auth_provider.dart';
 import 'package:wafi_ecommerce/shared/widgets/app_section_header.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_button.dart';

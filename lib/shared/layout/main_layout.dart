@@ -1,17 +1,23 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wafi_ecommerce/core/constants/colors.dart';
-import 'package:wafi_ecommerce/core/theme/theme_provider.dart';
-import 'package:wafi_ecommerce/core/utils/firestore_seeder.dart';
+import 'package:wafi_ecommerce/core/config/theme/theme_provider.dart';
 import 'package:wafi_ecommerce/features/auth/auth_provider.dart';
-import 'package:wafi_ecommerce/features/customers/customers_screen.dart';
+import 'package:wafi_ecommerce/features/customers/customer_screen.dart';
 import 'package:wafi_ecommerce/features/dashboard/dashboard_screen.dart';
-import 'package:wafi_ecommerce/features/orders/orders_screen.dart';
-import 'package:wafi_ecommerce/features/products/products_screen.dart';
-import 'package:wafi_ecommerce/features/settings/settings_screen.dart';
+import 'package:wafi_ecommerce/features/orders/order_screen.dart';
+import 'package:wafi_ecommerce/features/products/product_screen.dart';
+import 'package:wafi_ecommerce/features/profile/profile_screen.dart';
+import 'package:wafi_ecommerce/features/settings/settings.dart';
+import 'package:wafi_ecommerce/features/users/user_screen.dart';
+import 'package:wafi_ecommerce/features/home/customer_home_screen.dart';
+import 'package:wafi_ecommerce/features/cart/cart_provider.dart';
+import 'package:wafi_ecommerce/features/cart/cart_screen.dart';
+import 'package:wafi_ecommerce/core/constants/colors.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_appbar.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_bottom_nav.dart';
+import 'package:wafi_ecommerce/shared/widgets/glass_drawer.dart';
+
+enum _BottomTab { home, products, orders, profile }
 
 class MainLayout extends ConsumerStatefulWidget {
   const MainLayout({super.key});
@@ -21,67 +27,170 @@ class MainLayout extends ConsumerStatefulWidget {
 }
 
 class _MainLayoutState extends ConsumerState<MainLayout> {
-  int _currentIndex = 0;
+  _BottomTab _currentTab = _BottomTab.home;
+  int _activeDrawerIndex = 0;
 
-  late final List<Widget> _pages = const [
-    DashboardScreen(),
-    ProductsScreen(),
-    OrdersScreen(),
-    CustomersScreen(),
-    SettingsScreen(),
-  ];
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  late final List<_PageMeta> _pageMeta = const [
-    _PageMeta(title: 'Dashboard', subtitle: 'Store pulse and quick actions'),
-    _PageMeta(title: 'Products', subtitle: 'Catalog, stock and pricing'),
-    _PageMeta(title: 'Orders', subtitle: 'Create, track and fulfil orders'),
-    _PageMeta(title: 'Customers', subtitle: 'Loyalty and buyer records'),
-    _PageMeta(title: 'Settings', subtitle: 'Theme and workspace tools'),
-  ];
+  _PageEntry _pageForTab(_BottomTab tab) {
+    switch (tab) {
+      case _BottomTab.home:
+        return const _PageEntry(
+          meta: _PageMeta(title: 'Wafi Store', subtitle: 'Discover collections'),
+          page: CustomerHomeScreen(),
+          icon: Icons.home_rounded,
+        );
+      case _BottomTab.products:
+        return const _PageEntry(
+          meta: _PageMeta(title: 'Products', subtitle: 'Catalog and stock'),
+          page: ProductsScreen(),
+          icon: Icons.inventory_2_rounded,
+        );
+      case _BottomTab.orders:
+        return const _PageEntry(
+          meta: _PageMeta(title: 'Orders', subtitle: 'Track and fulfil'),
+          page: OrdersScreen(),
+          icon: Icons.receipt_long_rounded,
+        );
+      case _BottomTab.profile:
+        return const _PageEntry(
+          meta: _PageMeta(title: 'Profile', subtitle: 'Your account'),
+          page: ProfileScreen(),
+          icon: Icons.person_rounded,
+        );
+    }
+  }
+
+  // ── Drawer index → page mapping ─────────────────────────────────────────────
+  _PageEntry _resolveEntry() {
+    switch (_activeDrawerIndex) {
+      case kDrawerDashboard:
+        return const _PageEntry(
+          meta: _PageMeta(title: 'Dashboard', subtitle: 'Store pulse'),
+          page: DashboardScreen(),
+          icon: Icons.dashboard_rounded,
+        );
+      case kDrawerCustomers:
+        return const _PageEntry(
+          meta: _PageMeta(title: 'Customers', subtitle: 'Buyer records'),
+          page: CustomersScreen(),
+          icon: Icons.people_rounded,
+        );
+      case kDrawerSettings:
+        return const _PageEntry(
+          meta: _PageMeta(title: 'Settings', subtitle: 'Workspace tools'),
+          page: SettingsScreen(),
+          icon: Icons.settings_rounded,
+        );
+      case kDrawerUsers:
+        return const _PageEntry(
+          meta: _PageMeta(title: 'Users', subtitle: 'Manage team members'),
+          page: UsersScreen(),
+          icon: Icons.manage_accounts_rounded,
+        );
+      default:
+        return _pageForTab(_currentTab);
+    }
+  }
+
+  // ── Tap handlers ────────────────────────────────────────────────────────────
+  void _onBottomTabTap(int index) {
+    final tab = _BottomTab.values[index];
+    if (tab == _currentTab && _activeDrawerIndex == index) return;
+    setState(() {
+      _currentTab = tab;
+      _activeDrawerIndex = index;
+    });
+  }
+
+  void _onDrawerItemTap(int drawerIndex) {
+    setState(() => _activeDrawerIndex = drawerIndex);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final themeMode = ref.watch(themeProvider);
-    final currentPage = _pageMeta[_currentIndex];
+    final role = ref.watch(typedRoleProvider);
+    final auth = ref.watch(authControllerProvider);
+    final entry = _resolveEntry();
+
+    final bottomIndex = _activeDrawerIndex < 4
+        ? _activeDrawerIndex
+        : _currentTab.index;
+
+    final showCart = (_activeDrawerIndex < 4) &&
+        (_currentTab == _BottomTab.home || _currentTab == _BottomTab.products);
 
     return Scaffold(
+      key: _scaffoldKey,
       extendBody: true,
+
+      // ── AppBar ──────────────────────────────────────────────────────────────
       appBar: GlassAppBar(
-        title: currentPage.title,
-        subtitle: currentPage.subtitle,
+        title: entry.meta.title,
+        subtitle: entry.meta.subtitle,
+        leading: GlassAppBarAction(
+          icon: Icons.menu_rounded,
+          onTap: () => _scaffoldKey.currentState?.openDrawer(),
+        ),
         actions: [
+          if (showCart)
+            Stack(
+              alignment: Alignment.topRight,
+              children: [
+                GlassAppBarAction(
+                  icon: Icons.shopping_cart_outlined,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CartScreen()),
+                  ),
+                ),
+                Consumer(
+                  builder: (context, ref, child) {
+                    final count = ref.watch(cartProvider).itemCount;
+                    if (count == 0) return const SizedBox.shrink();
+                    return Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: AppColors.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          '$count',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           GlassAppBarAction(
-            icon: themeMode == ThemeMode.dark
+            icon: ref.watch(themeProvider) == ThemeMode.dark
                 ? Icons.light_mode_rounded
                 : Icons.dark_mode_rounded,
             onTap: () => ref.read(themeProvider.notifier).toggleTheme(),
           ),
-          if (_currentIndex == 0)
-            GlassAppBarAction(
-              icon: Icons.auto_fix_high_rounded,
-              onTap: () async {
-                await FirestoreSeeder.seedAll();
-                if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Firestore seeded.')),
-                );
-              },
-            ),
-          GlassAppBarAction(
-            icon: _currentIndex == 4
-                ? Icons.logout_rounded
-                : Icons.settings_rounded,
-            onTap: _currentIndex == 4
-                ? () async {
-                    await ref.read(authControllerProvider.notifier).logout();
-                  }
-                : () {
-                    setState(() => _currentIndex = 4);
-                  },
-            color: _currentIndex == 4 ? AppColors.error : null,
-          ),
         ],
       ),
+
+
+      drawer: GlassDrawer(
+        storeName: auth.tenantId ?? auth.email ?? 'Wafi Store',
+        email: auth.email ?? '',
+        role: role.name,
+        currentIndex: _activeDrawerIndex,
+        onItemTap: _onDrawerItemTap,
+        onLogout: () async {
+          await ref.read(authControllerProvider.notifier).logout();
+        },
+      ),
+
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -90,20 +199,39 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
             bottom: false,
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 260),
-              child: _pages[_currentIndex],
+              child: KeyedSubtree(
+                key: ValueKey(_activeDrawerIndex),
+                child: entry.page,
+              ),
             ),
           ),
         ],
       ),
+
       bottomNavigationBar: GlassBottomNav(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          if (index == _currentIndex) return;
-          setState(() => _currentIndex = index);
-        },
+        currentIndex: bottomIndex,
+        onTap: _onBottomTabTap,
       ),
     );
   }
+}
+
+
+class _PageMeta {
+  final String title;
+  final String subtitle;
+  const _PageMeta({required this.title, required this.subtitle});
+}
+
+class _PageEntry {
+  final _PageMeta meta;
+  final Widget page;
+  final IconData icon;
+  const _PageEntry({
+    required this.meta,
+    required this.page,
+    required this.icon,
+  });
 }
 
 class _AppBackdrop extends StatelessWidget {
@@ -111,79 +239,9 @@ class _AppBackdrop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = Theme.of(context).brightness;
-
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: brightness == Brightness.dark
-                  ? [
-                      AppColors.bgSecondary,
-                      AppColors.bgPrimary,
-                      AppColors.bgTertiary,
-                    ]
-                  : [
-                      AppColors.bgSecondaryLight,
-                      AppColors.bgPrimaryLight,
-                      AppColors.bgTertiaryLight,
-                    ],
-            ),
-          ),
-        ),
-        Positioned(
-          top: -110,
-          right: -40,
-          child: _GlowOrb(
-            size: 250,
-            color: AppColors.primary.withValues(
-              alpha: brightness == Brightness.dark ? 0.22 : 0.12,
-            ),
-          ),
-        ),
-        Positioned(
-          top: 220,
-          left: -80,
-          child: _GlowOrb(
-            size: 220,
-            color: AppColors.purple.withValues(
-              alpha: brightness == Brightness.dark ? 0.16 : 0.08,
-            ),
-          ),
-        ),
-      ],
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      color: isDark ? const Color(0xFF08080A) : const Color(0xFFFCFCFD),
     );
   }
-}
-
-class _GlowOrb extends StatelessWidget {
-  final double size;
-  final Color color;
-
-  const _GlowOrb({required this.size, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: ImageFiltered(
-        imageFilter: ImageFilter.blur(sigmaX: 60, sigmaY: 60),
-        child: Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-        ),
-      ),
-    );
-  }
-}
-
-class _PageMeta {
-  final String title;
-  final String subtitle;
-
-  const _PageMeta({required this.title, required this.subtitle});
 }

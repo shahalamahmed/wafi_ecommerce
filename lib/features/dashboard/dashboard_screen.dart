@@ -1,20 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wafi_ecommerce/core/constants/colors.dart';
-import 'package:wafi_ecommerce/core/providers.dart';
-import 'package:wafi_ecommerce/core/utils/text_utils.dart';
-import 'package:wafi_ecommerce/core/utils/firestore_seeder.dart';
+import 'package:wafi_ecommerce/core/api/firestore_service.dart';
+import 'package:wafi_ecommerce/core/constants/user_role.dart';
+import 'package:wafi_ecommerce/core/utils/helpers.dart';
+import 'package:wafi_ecommerce/core/utils/seeder.dart';
+import 'package:wafi_ecommerce/core/widgets/role_guard.dart';
 import 'package:wafi_ecommerce/features/auth/auth_provider.dart';
 import 'package:wafi_ecommerce/features/customers/customer_editor_sheet.dart';
+import 'package:wafi_ecommerce/features/dashboard/users_management_screen.dart';
 import 'package:wafi_ecommerce/features/orders/order_editor_sheet.dart';
 import 'package:wafi_ecommerce/features/products/product_editor_sheet.dart';
 import 'package:wafi_ecommerce/shared/widgets/app_section_header.dart';
 import 'package:wafi_ecommerce/shared/widgets/empty_state.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_button.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_card.dart';
-import 'package:wafi_ecommerce/models/customer_model.dart';
-import 'package:wafi_ecommerce/models/order_model.dart';
-import 'package:wafi_ecommerce/models/product_model.dart';
+import 'package:wafi_ecommerce/features/customers/customer_model.dart';
+import 'package:wafi_ecommerce/features/customers/customer_provider.dart';
+import 'package:wafi_ecommerce/features/orders/order_model.dart';
+import 'package:wafi_ecommerce/features/orders/order_provider.dart';
+import 'package:wafi_ecommerce/features/products/product_model.dart';
+import 'package:wafi_ecommerce/features/products/product_provider.dart';
+import 'package:wafi_ecommerce/features/tenant/tenant_provider.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -65,14 +72,14 @@ class DashboardScreen extends ConsumerWidget {
     final tenantId = ref.watch(tenantIdProvider) ?? '';
     final auth = ref.watch(authControllerProvider);
     final tenantAsync = ref.watch(tenantStreamProvider(tenantId));
-    final productsAsync = ref.watch(productsStreamProvider(tenantId));
-    final ordersAsync = ref.watch(ordersStreamProvider(tenantId));
-    final customersAsync = ref.watch(customersStreamProvider(tenantId));
+    final productState = ref.watch(productListProvider(tenantId));
+    final orderState = ref.watch(orderListProvider(tenantId));
+    final customerState = ref.watch(customerListProvider(tenantId));
 
     final tenant = tenantAsync.valueOrNull;
-    final products = productsAsync.valueOrNull ?? const <ProductModel>[];
-    final orders = ordersAsync.valueOrNull ?? const <OrderModel>[];
-    final customers = customersAsync.valueOrNull ?? const <CustomerModel>[];
+    final products = productState.products;
+    final orders = orderState.orders;
+    final customers = customerState.customers;
 
     final lowStockProducts = products
         .where((product) => product.isLowStock)
@@ -125,6 +132,20 @@ class DashboardScreen extends ConsumerWidget {
                 expand: false,
                 variant: GlassButtonVariant.secondary,
               ),
+              // dashboard_screen.dart এ
+              RoleGuard(
+                canAccess: (role) => role == UserRole.admin,
+                child: ListTile(
+                  leading: const Icon(Icons.manage_accounts),
+                  title:   const Text('Manage Users'),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const UsersManagementScreen(),
+                    ),
+                  ),
+                ),
+              ),
               GlassButton(
                 label: 'Seed Demo',
                 onPressed: () => _seedDemo(context),
@@ -171,7 +192,7 @@ class DashboardScreen extends ConsumerWidget {
             subtitle: 'Products that need attention before stock hits zero.',
           ),
           const SizedBox(height: 12),
-          if (productsAsync.isLoading)
+          if (productState.isLoading)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 20),
               child: Center(child: CircularProgressIndicator()),
@@ -199,7 +220,7 @@ class DashboardScreen extends ConsumerWidget {
             subtitle: 'Latest orders and current fulfilment state.',
           ),
           const SizedBox(height: 12),
-          if (ordersAsync.isLoading)
+          if (orderState.isLoading)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 20),
               child: Center(child: CircularProgressIndicator()),

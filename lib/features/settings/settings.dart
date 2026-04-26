@@ -1,8 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wafi_ecommerce/core/config/theme/theme_provider.dart';
 import 'package:wafi_ecommerce/core/constants/colors.dart';
-import 'package:wafi_ecommerce/core/theme/theme_provider.dart';
 import 'package:wafi_ecommerce/features/auth/auth_provider.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_button.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_card.dart';

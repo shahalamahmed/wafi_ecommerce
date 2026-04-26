@@ -4,7 +4,7 @@ import 'package:wafi_ecommerce/core/constants/colors.dart';
 import 'package:wafi_ecommerce/core/constants/sizes.dart';
 import 'package:wafi_ecommerce/features/auth/auth_model.dart';
 import 'package:wafi_ecommerce/features/auth/auth_provider.dart';
-import 'package:wafi_ecommerce/shared/widgets/auth_widgets.dart';
+import 'package:wafi_ecommerce/features/auth/widgets/auth_widgets.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_button.dart';
 import 'package:wafi_ecommerce/shared/widgets/snackbar_message.dart';
 
@@ -57,48 +57,54 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     const tenantId = 'wafi_store_1776856408474';
 
-    await ref
-        .read(authControllerProvider.notifier)
-        .register(
-          storeName: _storeNameController.text.trim(),
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-          tenantId: tenantId,
-          role: 'admin',
+    try {
+      await ref.read(authControllerProvider.notifier).register(
+            storeName: _storeNameController.text.trim(),
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+            tenantId: tenantId,
+            role: 'Viewer',
+          );
+
+      if (!mounted) return;
+
+      final authState = ref.read(authControllerProvider);
+      if (authState.status == AuthStatus.authenticated) {
+        SnackbarMessage.show(
+          context: context,
+          message: 'Store created successfully.',
         );
-
-    if (!mounted) return;
-
-    final authState = ref.read(authControllerProvider);
-    if (authState.status == AuthStatus.authenticated) {
+      }
+    } catch (e) {
+      if (!mounted) return;
+      final authState = ref.read(authControllerProvider);
       SnackbarMessage.show(
         context: context,
-        message: 'Store created successfully.',
-      );
-    } else if (authState.status == AuthStatus.error) {
-      SnackbarMessage.show(
-        context: context,
-        message: authState.errorMessage ?? 'Unable to create store.',
+        message: authState.error?.message ?? e.toString(),
         isError: true,
       );
     }
   }
 
   Future<void> _googleRegister() async {
-    await ref.read(authControllerProvider.notifier).loginWithGoogle();
+    try {
+      await ref.read(authControllerProvider.notifier).loginWithGoogle();
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    final authState = ref.read(authControllerProvider);
-    if (authState.status == AuthStatus.authenticated) {
+      final authState = ref.read(authControllerProvider);
+      if (authState.status == AuthStatus.authenticated) {
+        SnackbarMessage.show(
+          context: context,
+          message: 'Google account connected successfully.',
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      final authState = ref.read(authControllerProvider);
       SnackbarMessage.show(
         context: context,
-        message: 'Google account connected successfully.',
-      );
-    } else if (authState.status == AuthStatus.error) {
-      SnackbarMessage.show(
-        context: context,
-        message: authState.errorMessage ?? 'Google sign in failed.',
+        message: authState.error?.message ?? e.toString(),
         isError: true,
       );
     }

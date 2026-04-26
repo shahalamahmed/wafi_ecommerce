@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wafi_ecommerce/core/providers.dart';
-import 'package:wafi_ecommerce/models/customer_model.dart';
+import 'package:wafi_ecommerce/core/api/firestore_service.dart';
+import 'package:wafi_ecommerce/shared/widgets/snackbar_message.dart';
+import 'customer_model.dart';
+import 'customer_provider.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_card.dart';
 
 class CustomerEditorSheet extends ConsumerStatefulWidget {
@@ -125,15 +127,13 @@ class _CustomerEditorSheetState extends ConsumerState<CustomerEditorSheet> {
       );
 
       await ref
-          .read(customerServiceProvider)
-          .saveCustomer(widget.tenantId, customer);
+          .read(customerListProvider(widget.tenantId).notifier)
+          .saveCustomer(customer);
       if (!mounted) return;
       Navigator.of(context).pop(true);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      SnackbarMessage.show(context: context, message: e.toString(), isError: true);
     } finally {
       if (mounted) {
         setState(() => _saving = false);
@@ -284,7 +284,7 @@ class _CustomerEditorSheetState extends ConsumerState<CustomerEditorSheet> {
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    initialValue: _group,
+                    value: _group,
                     decoration: const InputDecoration(
                       labelText: 'Customer group',
                     ),
@@ -305,7 +305,7 @@ class _CustomerEditorSheetState extends ConsumerState<CustomerEditorSheet> {
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    initialValue: _source,
+                    value: _source,
                     decoration: const InputDecoration(labelText: 'Source'),
                     items: const [
                       DropdownMenuItem(

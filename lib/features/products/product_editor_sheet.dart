@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wafi_ecommerce/core/providers.dart';
-import 'package:wafi_ecommerce/core/utils/text_utils.dart';
-import 'package:wafi_ecommerce/features/brands/brands_providers.dart';
-import 'package:wafi_ecommerce/features/categories/categories_providers.dart';
-import 'package:wafi_ecommerce/models/brand_model.dart';
-import 'package:wafi_ecommerce/models/category_model.dart';
-import 'package:wafi_ecommerce/models/product_model.dart';
+
+import 'package:wafi_ecommerce/core/utils/helpers.dart';
+import 'package:wafi_ecommerce/features/brands/brand_provider.dart';
+import 'package:wafi_ecommerce/features/categories/category_provider.dart';
+import 'package:wafi_ecommerce/features/brands/brand_model.dart';
+import 'package:wafi_ecommerce/features/categories/category_model.dart';
+import 'product_model.dart';
+import 'product_provider.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_card.dart';
 
 class ProductEditorSheet extends ConsumerStatefulWidget {
@@ -124,14 +125,18 @@ class _ProductEditorSheetState extends ConsumerState<ProductEditorSheet> {
           .read(brandServiceProvider)
           .fetchBrands(widget.tenantId);
 
-      final selectedCategory = categories.cast<CategoryModel?>().firstWhere(
-        (category) => category?.id == _categoryId,
-        orElse: () => null,
-      );
-      final selectedBrand = brands.cast<BrandModel?>().firstWhere(
-        (brand) => brand?.id == _brandId,
-        orElse: () => null,
-      );
+      final selectedCategory = (categories.data?.items ?? [])
+          .cast<CategoryModel?>()
+          .firstWhere(
+            (category) => category?.id == _categoryId,
+            orElse: () => null,
+          );
+      final selectedBrand = (brands.data?.items ?? [])
+          .cast<BrandModel?>()
+          .firstWhere(
+            (brand) => brand?.id == _brandId,
+            orElse: () => null,
+          );
 
       final fallbackCategory =
           widget.product != null &&
@@ -205,8 +210,8 @@ class _ProductEditorSheetState extends ConsumerState<ProductEditorSheet> {
   Widget build(BuildContext context) {
     final asyncCategories = ref.watch(categoryListProvider(widget.tenantId));
     final asyncBrands = ref.watch(brandListProvider(widget.tenantId));
-    final categories = asyncCategories.valueOrNull ?? const <CategoryModel>[];
-    final brands = asyncBrands.valueOrNull ?? const <BrandModel>[];
+    final categories = asyncCategories.categories;
+    final brands = asyncBrands.brands;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final title = widget.product == null ? 'Add Product' : 'Edit Product';
     final categoryValue =
@@ -289,7 +294,7 @@ class _ProductEditorSheetState extends ConsumerState<ProductEditorSheet> {
                           items: [
                             const DropdownMenuItem<String>(
                               value: '',
-                              child: Text('Uncategorized'),
+                              child: Text(''),
                             ),
                             ...categories.map(
                               (category) => DropdownMenuItem<String>(
@@ -310,7 +315,7 @@ class _ProductEditorSheetState extends ConsumerState<ProductEditorSheet> {
                           items: [
                             const DropdownMenuItem<String>(
                               value: '',
-                              child: Text('Unbranded'),
+                              child: Text(''),
                             ),
                             ...brands.map(
                               (brand) => DropdownMenuItem<String>(
@@ -325,7 +330,7 @@ class _ProductEditorSheetState extends ConsumerState<ProductEditorSheet> {
                       ),
                     ],
                   ),
-                  if (asyncCategories.hasError || asyncBrands.hasError) ...[
+                  if (asyncCategories.error != null || asyncBrands.error != null) ...[
                     const SizedBox(height: 8),
                     Text(
                       'Categories or brands failed to load.',

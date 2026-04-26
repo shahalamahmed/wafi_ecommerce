@@ -4,7 +4,7 @@ import 'package:wafi_ecommerce/core/constants/colors.dart';
 import 'package:wafi_ecommerce/core/constants/sizes.dart';
 import 'package:wafi_ecommerce/features/auth/auth_model.dart';
 import 'package:wafi_ecommerce/features/auth/auth_provider.dart';
-import 'package:wafi_ecommerce/shared/widgets/auth_widgets.dart';
+import 'package:wafi_ecommerce/features/auth/widgets/auth_widgets.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_button.dart';
 import 'package:wafi_ecommerce/shared/widgets/snackbar_message.dart';
 
@@ -39,45 +39,51 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       return;
     }
 
-    await ref
-        .read(authControllerProvider.notifier)
-        .login(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
+    try {
+      await ref.read(authControllerProvider.notifier).login(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+          );
+
+      if (!mounted) return;
+
+      final authState = ref.read(authControllerProvider);
+      if (authState.status == AuthStatus.authenticated) {
+        SnackbarMessage.show(
+          context: context,
+          message: 'Signed in successfully.',
         );
-
-    if (!mounted) return;
-
-    final authState = ref.read(authControllerProvider);
-    if (authState.status == AuthStatus.authenticated) {
+      }
+    } catch (e) {
+      if (!mounted) return;
+      final authState = ref.read(authControllerProvider);
       SnackbarMessage.show(
         context: context,
-        message: 'Signed in successfully.',
-      );
-    } else if (authState.status == AuthStatus.error) {
-      SnackbarMessage.show(
-        context: context,
-        message: authState.errorMessage ?? 'Unable to sign in.',
+        message: authState.error?.message ?? e.toString(),
         isError: true,
       );
     }
   }
 
   Future<void> _googleLogin() async {
-    await ref.read(authControllerProvider.notifier).loginWithGoogle();
+    try {
+      await ref.read(authControllerProvider.notifier).loginWithGoogle();
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    final authState = ref.read(authControllerProvider);
-    if (authState.status == AuthStatus.authenticated) {
+      final authState = ref.read(authControllerProvider);
+      if (authState.status == AuthStatus.authenticated) {
+        SnackbarMessage.show(
+          context: context,
+          message: 'Google sign in successful.',
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      final authState = ref.read(authControllerProvider);
       SnackbarMessage.show(
         context: context,
-        message: 'Google sign in successful.',
-      );
-    } else if (authState.status == AuthStatus.error) {
-      SnackbarMessage.show(
-        context: context,
-        message: authState.errorMessage ?? 'Google sign in failed.',
+        message: authState.error?.message ?? e.toString(),
         isError: true,
       );
     }

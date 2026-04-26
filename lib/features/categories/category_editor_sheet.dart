@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wafi_ecommerce/core/providers.dart';
-import 'package:wafi_ecommerce/core/utils/text_utils.dart';
-import 'package:wafi_ecommerce/models/category_model.dart';
+import 'package:wafi_ecommerce/core/api/firestore_service.dart';
+import 'package:wafi_ecommerce/core/utils/helpers.dart';
+import 'package:wafi_ecommerce/shared/widgets/snackbar_message.dart';
+import 'category_model.dart';
+import 'category_provider.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_card.dart';
 
 class CategoryEditorSheet extends ConsumerStatefulWidget {
@@ -70,16 +72,14 @@ class _CategoryEditorSheetState extends ConsumerState<CategoryEditorSheet> {
       );
 
       await ref
-          .read(categoryServiceProvider)
-          .saveCategory(widget.tenantId, category);
+          .read(categoryListProvider(widget.tenantId).notifier)
+          .saveCategory(category);
 
       if (!mounted) return;
       Navigator.of(context).pop(true);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      SnackbarMessage.show(context: context, message: e.toString(), isError: true);
     } finally {
       if (mounted) {
         setState(() => _saving = false);

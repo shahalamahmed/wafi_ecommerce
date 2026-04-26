@@ -78,59 +78,30 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
 
               // Title
               Expanded(
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        gradient: const LinearGradient(
-                          colors: [AppColors.primary, AppColors.purple],
+                    Text(
+                      title,
+                      style: GoogleFonts.poppins(
+                        color: AppColors.textPrimaryFor(brightness),
+                        fontSize: AppSizes.fontXl,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle!,
+                        style: GoogleFonts.poppins(
+                          color: AppColors.textSecondaryFor(brightness),
+                          fontSize: AppSizes.fontXs,
+                          fontWeight: FontWeight.w400,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.18),
-                            blurRadius: 14,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
                       ),
-                      child: const Icon(
-                        Icons.shopping_bag_rounded,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            title,
-                            style: GoogleFonts.poppins(
-                              color: AppColors.textPrimaryFor(brightness),
-                              fontSize: AppSizes.fontXl,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: -0.3,
-                            ),
-                          ),
-                          if (subtitle != null) ...[
-                            const SizedBox(height: 2),
-                            Text(
-                              subtitle!,
-                              style: GoogleFonts.poppins(
-                                color: AppColors.textSecondaryFor(brightness),
-                                fontSize: AppSizes.fontXs,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
+                    ],
                   ],
                 ),
               ),

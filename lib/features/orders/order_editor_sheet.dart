@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wafi_ecommerce/core/providers.dart';
-import 'package:wafi_ecommerce/core/utils/text_utils.dart';
+import 'package:wafi_ecommerce/core/utils/helpers.dart';
 import 'package:wafi_ecommerce/features/auth/auth_provider.dart';
-import 'package:wafi_ecommerce/models/product_model.dart';
-import 'package:wafi_ecommerce/services/order_service.dart';
+import 'package:wafi_ecommerce/features/orders/order_model.dart';
+import 'package:wafi_ecommerce/features/orders/order_provider.dart';
+import 'package:wafi_ecommerce/features/products/product_model.dart';
+import 'package:wafi_ecommerce/core/constants/user_role.dart';
+import 'package:wafi_ecommerce/features/products/product_provider.dart';
+import 'order_service.dart';
 import 'package:wafi_ecommerce/shared/widgets/empty_state.dart';
 import 'package:wafi_ecommerce/shared/widgets/glass_card.dart';
 
 class OrderEditorSheet extends ConsumerStatefulWidget {
   final String tenantId;
+  final List<OrderItem>? initialItems;
 
-  const OrderEditorSheet({super.key, required this.tenantId});
+  const OrderEditorSheet({super.key, required this.tenantId, this.initialItems});
 
   @override
   ConsumerState<OrderEditorSheet> createState() => _OrderEditorSheetState();
@@ -42,7 +46,35 @@ class _OrderEditorSheetState extends ConsumerState<OrderEditorSheet> {
   String _shippingMethod = 'courier';
   String _source = 'pos';
   bool _saving = false;
-  final List<_OrderLineDraft> _lines = [_OrderLineDraft()];
+  late final List<_OrderLineDraft> _lines;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.initialItems != null && widget.initialItems!.isNotEmpty) {
+      _lines = widget.initialItems!
+          .map((item) => _OrderLineDraft()
+        ..productId = item.productId
+        ..quantity = item.quantity)
+          .toList();
+    } else {
+      _lines = [_OrderLineDraft()];
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final auth = ref.read(authControllerProvider);
+      final role = ref.read(typedRoleProvider);
+      if (role == UserRole.viewer && auth.email != null) {
+        _customerEmailController.text = auth.email!;
+        _customerNameController.text = auth.email!.split('@').first;
+        setState(() {
+          _source = 'online';
+          _status = 'pending';
+        });
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -71,9 +103,7 @@ class _OrderEditorSheetState extends ConsumerState<OrderEditorSheet> {
 
     final items = <OrderLineRequest>[];
     for (final line in _lines) {
-      if (line.productId == null || line.quantity <= 0) {
-        continue;
-      }
+      if (line.productId == null || line.quantity <= 0) continue;
       items.add(
         OrderLineRequest(productId: line.productId!, quantity: line.quantity),
       );
@@ -89,8 +119,11 @@ class _OrderEditorSheetState extends ConsumerState<OrderEditorSheet> {
     setState(() => _saving = true);
     try {
       final auth = ref.read(authControllerProvider);
+      final role = ref.read(typedRoleProvider);
+      final customerId = role == UserRole.viewer ? (auth.uid ?? '') : '';
+
       final request = CreateOrderRequest(
-        customerId: '',
+        customerId: customerId,
         customerName: _customerNameController.text.trim(),
         customerPhone: _customerPhoneController.text.trim(),
         customerEmail: _customerEmailController.text.trim(),
@@ -128,24 +161,33 @@ class _OrderEditorSheetState extends ConsumerState<OrderEditorSheet> {
       final result = await ref
           .read(orderServiceProvider)
           .createOrder(widget.tenantId, request);
+
       if (!mounted) return;
-      Navigator.of(context).pop(result);
+
+      if (result.isSuccess && result.data != null) {
+        ref.read(orderListProvider(widget.tenantId).notifier).refresh();
+        Navigator.of(context).pop(result.data);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result.error?.message ?? 'Failed to create order'),
+          ),
+        );
+      }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
     } finally {
-      if (mounted) {
-        setState(() => _saving = false);
-      }
+      if (mounted) setState(() => _saving = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final asyncProducts = ref.watch(productsStreamProvider(widget.tenantId));
-    final products = asyncProducts.valueOrNull ?? const <ProductModel>[];
+    final productState = ref.watch(productListProvider(widget.tenantId));
+    final products = productState.products;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SafeArea(
@@ -197,10 +239,6 @@ class _OrderEditorSheetState extends ConsumerState<OrderEditorSheet> {
                           controller: _customerPhoneController,
                           label: 'Phone',
                           keyboardType: TextInputType.phone,
-                          validator: (value) =>
-                              value == null || value.trim().isEmpty
-                              ? 'Phone is required'
-                              : null,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -216,7 +254,7 @@ class _OrderEditorSheetState extends ConsumerState<OrderEditorSheet> {
                   const SizedBox(height: 16),
                   const _SectionTitle(title: 'Items'),
                   const SizedBox(height: 10),
-                  if (asyncProducts.isLoading)
+                  if (productState.isLoading)
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 20),
                       child: Center(child: CircularProgressIndicator()),
@@ -226,13 +264,13 @@ class _OrderEditorSheetState extends ConsumerState<OrderEditorSheet> {
                       icon: Icons.inventory_2_outlined,
                       title: 'Add products first',
                       message:
-                          'You need at least one product in the catalog to create an order.',
+                      'You need at least one product in the catalog to create an order.',
                     )
                   else
                     Column(
                       children: [
                         ..._lines.asMap().entries.map(
-                          (entry) => Padding(
+                              (entry) => Padding(
                             padding: const EdgeInsets.only(bottom: 12),
                             child: _OrderLineField(
                               key: ValueKey(entry.key),
@@ -240,8 +278,8 @@ class _OrderEditorSheetState extends ConsumerState<OrderEditorSheet> {
                               draft: entry.value,
                               onRemove: _lines.length > 1
                                   ? () => setState(
-                                      () => _lines.removeAt(entry.key),
-                                    )
+                                    () => _lines.removeAt(entry.key),
+                              )
                                   : null,
                             ),
                           ),
@@ -424,12 +462,8 @@ class _OrderEditorSheetState extends ConsumerState<OrderEditorSheet> {
                     lines: _lines,
                     products: products,
                     discount: _parseDouble(_discountController.text),
-                    couponDiscount: _parseDouble(
-                      _couponDiscountController.text,
-                    ),
-                    deliveryCharge: _parseDouble(
-                      _deliveryChargeController.text,
-                    ),
+                    couponDiscount: _parseDouble(_couponDiscountController.text),
+                    deliveryCharge: _parseDouble(_deliveryChargeController.text),
                     tax: _parseDouble(_taxController.text),
                   ),
                   const SizedBox(height: 16),
@@ -439,13 +473,13 @@ class _OrderEditorSheetState extends ConsumerState<OrderEditorSheet> {
                       onPressed: _saving ? null : () => _save(products),
                       child: _saving
                           ? SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: isDark ? Colors.black : Colors.white,
-                              ),
-                            )
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: isDark ? Colors.black : Colors.white,
+                        ),
+                      )
                           : const Text('Create Order'),
                     ),
                   ),
@@ -458,9 +492,8 @@ class _OrderEditorSheetState extends ConsumerState<OrderEditorSheet> {
     );
   }
 
-  static double _parseDouble(String value) {
-    return double.tryParse(value.trim()) ?? 0;
-  }
+  static double _parseDouble(String value) =>
+      double.tryParse(value.trim()) ?? 0;
 }
 
 class _OrderLineDraft {
@@ -468,7 +501,7 @@ class _OrderLineDraft {
   int quantity = 1;
 }
 
-class _OrderLineField extends StatelessWidget {
+class _OrderLineField extends StatefulWidget {
   final List<ProductModel> products;
   final _OrderLineDraft draft;
   final VoidCallback? onRemove;
@@ -481,7 +514,22 @@ class _OrderLineField extends StatelessWidget {
   });
 
   @override
+  State<_OrderLineField> createState() => _OrderLineFieldState();
+}
+
+class _OrderLineFieldState extends State<_OrderLineField> {
+  @override
   Widget build(BuildContext context) {
+    // Duplicate product ID হলে dropdown crash করে — dedup করো
+    final seen = <String>{};
+    final uniqueProducts =
+    widget.products.where((p) => seen.add(p.id)).toList();
+
+    final currentValue =
+    uniqueProducts.any((p) => p.id == widget.draft.productId)
+        ? widget.draft.productId
+        : null;
+
     return GlassCard(
       padding: const EdgeInsets.all(12),
       child: Column(
@@ -490,44 +538,40 @@ class _OrderLineField extends StatelessWidget {
             children: [
               Expanded(
                 child: DropdownButtonFormField<String>(
-                  initialValue: draft.productId,
+                  value: currentValue,
                   isExpanded: true,
                   decoration: const InputDecoration(labelText: 'Product'),
-                  items: products
+                  items: uniqueProducts
                       .map(
                         (product) => DropdownMenuItem<String>(
-                          value: product.id,
-                          child: Text(
-                            '${product.name} • ${formatMoney(product.price, symbol: product.currency)}',
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      )
+                      value: product.id,
+                      child: Text(
+                        '${product.name} • ${formatMoney(product.price, symbol: product.currency)}',
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  )
                       .toList(),
-                  onChanged: (value) => draft.productId = value,
+                  onChanged: (value) {
+                    setState(() => widget.draft.productId = value);
+                  },
                 ),
               ),
-              if (onRemove != null)
+              if (widget.onRemove != null)
                 IconButton(
-                  onPressed: onRemove,
+                  onPressed: widget.onRemove,
                   icon: const Icon(Icons.remove_circle_outline_rounded),
                 ),
             ],
           ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  initialValue: draft.quantity.toString(),
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Quantity'),
-                  onChanged: (value) {
-                    draft.quantity = int.tryParse(value.trim()) ?? 1;
-                  },
-                ),
-              ),
-            ],
+          TextFormField(
+            initialValue: widget.draft.quantity.toString(),
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(labelText: 'Quantity'),
+            onChanged: (value) {
+              widget.draft.quantity = int.tryParse(value.trim()) ?? 1;
+            },
           ),
         ],
       ),
@@ -557,8 +601,9 @@ class _OrderSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final subtotal = lines.fold<double>(0, (sum, line) {
+      if (line.productId == null) return sum;
       final product = products.firstWhere(
-        (item) => item.id == line.productId,
+            (item) => item.id == line.productId,
         orElse: () => ProductModel(
           id: '',
           name: '',
@@ -591,7 +636,8 @@ class _OrderSummary extends StatelessWidget {
       return sum + (product.price * line.quantity);
     });
 
-    final total = (subtotal - discount - couponDiscount + deliveryCharge + tax)
+    final total =
+    (subtotal - discount - couponDiscount + deliveryCharge + tax)
         .clamp(0, double.infinity);
 
     return GlassCard(
@@ -600,9 +646,10 @@ class _OrderSummary extends StatelessWidget {
         children: [
           Text(
             'Estimated total',
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
           _SummaryRow(label: 'Subtotal', value: formatMoney(subtotal)),
@@ -680,15 +727,13 @@ class _SelectChip extends StatelessWidget {
       items: options
           .map(
             (option) => DropdownMenuItem<String>(
-              value: option,
-              child: Text(capitalizeWords(option.replaceAll('_', ' '))),
-            ),
-          )
+          value: option,
+          child: Text(capitalizeWords(option.replaceAll('_', ' '))),
+        ),
+      )
           .toList(),
       onChanged: (value) {
-        if (value != null) {
-          onChanged(value);
-        }
+        if (value != null) onChanged(value);
       },
     );
   }
@@ -730,9 +775,10 @@ class _SectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       title,
-      style: Theme.of(
-        context,
-      ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+      style: Theme.of(context)
+          .textTheme
+          .titleMedium
+          ?.copyWith(fontWeight: FontWeight.w700),
     );
   }
 }

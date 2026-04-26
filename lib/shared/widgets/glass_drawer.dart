@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:wafi_ecommerce/core/constants/colors.dart';
 import 'package:wafi_ecommerce/core/constants/sizes.dart';
 
+// Drawer index constants — MainLayout এর সাথে match করতে হবে
+const int kDrawerDashboard = 10;
+const int kDrawerCustomers = 11;
+const int kDrawerSettings  = 12;
+const int kDrawerUsers     = 13;
+
 class GlassDrawer extends StatelessWidget {
   final String storeName;
   final String email;
@@ -45,28 +51,26 @@ class GlassDrawer extends StatelessWidget {
       child: SafeArea(
         child: Column(
           children: [
-            // Header
             _buildHeader(brightness),
-
             const SizedBox(height: 8),
-
-            // Divider
             Divider(
               color: AppColors.glassBorderFor(brightness),
               thickness: 0.5,
               indent: 20,
               endIndent: 20,
             ),
-
             const SizedBox(height: 8),
 
-            // Menu Items
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 children: [
+                  // ── Section label ──────────────────────────────────────
+                  _buildSectionLabel('Management', brightness),
+                  const SizedBox(height: 4),
+
                   _buildMenuItem(
-                    index: 0,
+                    index: kDrawerDashboard,
                     icon: Icons.dashboard_outlined,
                     activeIcon: Icons.dashboard_rounded,
                     label: 'Dashboard',
@@ -74,34 +78,33 @@ class GlassDrawer extends StatelessWidget {
                     brightness: brightness,
                   ),
                   _buildMenuItem(
-                    index: 1,
-                    icon: Icons.inventory_2_outlined,
-                    activeIcon: Icons.inventory_2_rounded,
-                    label: 'Products',
-                    context: context,
-                    brightness: brightness,
-                  ),
-                  _buildMenuItem(
-                    index: 2,
-                    icon: Icons.shopping_bag_outlined,
-                    activeIcon: Icons.shopping_bag_rounded,
-                    label: 'Orders',
-                    context: context,
-                    brightness: brightness,
-                  ),
-                  _buildMenuItem(
-                    index: 3,
+                    index: kDrawerCustomers,
                     icon: Icons.people_outline_rounded,
                     activeIcon: Icons.people_rounded,
                     label: 'Customers',
                     context: context,
                     brightness: brightness,
                   ),
+
+                  const SizedBox(height: 12),
+
+                  // ── Section label ──────────────────────────────────────
+                  _buildSectionLabel('System', brightness),
+                  const SizedBox(height: 4),
+
                   _buildMenuItem(
-                    index: 4,
+                    index: kDrawerSettings,
                     icon: Icons.settings_outlined,
                     activeIcon: Icons.settings_rounded,
                     label: 'Settings',
+                    context: context,
+                    brightness: brightness,
+                  ),
+                  _buildMenuItem(
+                    index: kDrawerUsers,
+                    icon: Icons.manage_accounts_outlined,
+                    activeIcon: Icons.manage_accounts_rounded,
+                    label: 'Users',
                     context: context,
                     brightness: brightness,
                   ),
@@ -109,19 +112,30 @@ class GlassDrawer extends StatelessWidget {
               ),
             ),
 
-            // Divider
             Divider(
               color: AppColors.glassBorderFor(brightness),
               thickness: 0.5,
               indent: 20,
               endIndent: 20,
             ),
-
-            // Logout
             _buildLogoutButton(context, brightness),
-
             const SizedBox(height: 16),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionLabel(String label, Brightness brightness) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16, bottom: 2),
+      child: Text(
+        label.toUpperCase(),
+        style: TextStyle(
+          color: AppColors.textSecondaryFor(brightness),
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.8,
         ),
       ),
     );
@@ -143,7 +157,6 @@ class GlassDrawer extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Avatar
           Container(
             width: 48,
             height: 48,
@@ -171,10 +184,7 @@ class GlassDrawer extends StatelessWidget {
               ),
             ),
           ),
-
           const SizedBox(width: 12),
-
-          // Info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -198,21 +208,13 @@ class GlassDrawer extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
-                // Role Badge
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(
-                      alpha: isDark ? 0.2 : 0.12,
-                    ),
+                    color: AppColors.primary.withValues(alpha: isDark ? 0.2 : 0.12),
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color: AppColors.primary.withValues(
-                        alpha: isDark ? 0.3 : 0.2,
-                      ),
+                      color: AppColors.primary.withValues(alpha: isDark ? 0.3 : 0.2),
                       width: 0.5,
                     ),
                   ),
@@ -260,9 +262,9 @@ class GlassDrawer extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           border: isActive
               ? Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.25),
-                  width: 0.5,
-                )
+            color: AppColors.primary.withValues(alpha: 0.25),
+            width: 0.5,
+          )
               : null,
         ),
         child: Row(

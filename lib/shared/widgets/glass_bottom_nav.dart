@@ -65,13 +65,6 @@ class GlassBottomNav extends StatelessWidget {
             label: 'Customers',
             brightness: brightness,
           ),
-          _buildNavItem(
-            index: 4,
-            icon: Icons.settings_outlined,
-            activeIcon: Icons.settings_rounded,
-            label: 'Settings',
-            brightness: brightness,
-          ),
         ],
       ),
     );
